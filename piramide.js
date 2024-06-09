@@ -112,17 +112,13 @@ var gFragmentShaderSrc;
 
 // guarda dados da interface e contexto do desenho
 var gCtx = {
-  axis: 0,   // eixo rodando
-  theta: [0, 0, 0],  // angulos por eixo
-  pause: false,        // 
-  numV: 36,          // número de vertices
   vista: mat4(),     // view matrix, inicialmente identidade
   perspectiva: mat4(), // projection matrix
 }
 
+var gaPiramides = [];
 var gaPosicoes = [];
 var gaCores = [];
-var gaPiramides = [];
 
 //camera
 var EYE = vec3(5, 5, 5);
@@ -176,7 +172,6 @@ function main() {
   console.log("Canvas: ", gCanvas.width, gCanvas.height);
 
   // interface
-  //crieInterface();
 
   // Inicializações feitas apenas 1 vez
   gl.viewport(0, 0, gCanvas.width, gCanvas.height);
@@ -195,7 +190,6 @@ function main() {
   console.log(gaPosicoes, gaCores)
 
   // shaders
-  //crieShaders();
   crieShaders();
 
   // finalmente...
