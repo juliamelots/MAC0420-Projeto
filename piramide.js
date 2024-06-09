@@ -98,8 +98,11 @@ class Piramide {
   numVertices = 12;
   pos;
   escala;
+  theta;
+  vtheta;
+  vtrans;
 
-  constructor(pos, escala) {
+  constructor(pos, escala, theta, vtheta, vtrans) {
     for (let i = 0; i < this.numVertices; i++) {
       gaPosicoes.push(VERTICES[i])
     }
@@ -110,6 +113,9 @@ class Piramide {
 
     this.pos = pos;
     this.escala = escala;
+    this.theta = theta;
+    this.vtheta = vtheta;
+    this.vtrans = vtrans;
   }
 }
 
@@ -139,7 +145,10 @@ function main() {
 
   let pos = vec3(0, 0, 0);
   let escala = vec3(1, 1, 1);
-  let piramide = new Piramide(pos, escala);
+  let theta = vec3(0, 0, 0);
+  let vtheta = vec3(0, 0, 0);
+  let vtrans = vec3(0, 0, 0);
+  let piramide = new Piramide(pos, escala, theta, vtheta, vtrans);
   console.log(piramide)
   gaPiramides.push(piramide);
 
