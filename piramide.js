@@ -207,13 +207,19 @@ function crieShaders() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  // rotacao
+  let rx = rotateX(gaPiramides[0].theta[0]);
+  let ry = rotateY(gaPiramides[0].theta[1]);
+  let rz = rotateZ(gaPiramides[0].theta[2]);
+
   // escala
   let s = scale(gaPiramides[0].escala[0], gaPiramides[0].escala[1], gaPiramides[0].escala[2]);
   
   // translacao
   let t = translate(gaPiramides[0].pos[0], gaPiramides[0].pos[1], gaPiramides[0].pos[2]);
     
-  let model = mult(t, s);
+  //let model = mult(t, s);
+  let model = mult(t, mult(s, mult(rz, mult(rx, ry))));
 
   gl.uniformMatrix4fv(gShader.uModelView, false, flatten(mult(gCtx.vista, model)));
   gl.drawArrays(gl.TRIANGLES, 0, gaPiramides[0].numVertices);
