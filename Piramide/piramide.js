@@ -251,6 +251,8 @@ function atualiza() {
 function render() {
   gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
+  atualiza();
+
   // rotacao
   let rx = rotateX(gaPiramides[0].theta[0]);
   let ry = rotateY(gaPiramides[0].theta[1]);
@@ -266,6 +268,9 @@ function render() {
 
   gl.uniformMatrix4fv(gShader.uModelView, false, flatten(mult(gCtx.vista, model)));
   gl.drawElements(gl.TRIANGLES, gaPiramides[0].numVertices, gl.UNSIGNED_BYTE, 0);
+
+  window.requestAnimationFrame(render);
+
 }
 // ========================================================
 // Código fonte dos shaders em GLSL
