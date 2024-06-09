@@ -199,6 +199,11 @@ function crieShaders() {
   gCtx.vista = lookAt(EYE, AT, UP);
 }
 
+function atualiza() {
+  gaPiramides[0].pos = add(gaPiramides[0].pos, gaPiramides[0].vtrans);
+  gaPiramides[0].theta = add(gaPiramides[0].theta, gaPiramides[0].vtheta);
+}
+
 // ==================================================================
 /**
  * Usa o shader para desenhar.
