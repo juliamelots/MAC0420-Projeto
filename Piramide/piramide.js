@@ -1,16 +1,3 @@
-/**
- * Programa usando WegGL para demonstrar a animação 3D de um cubo
- * em perspectiva com rotação em cada eixo.
- *  
- * Bibliotecas utilizadas
- * macWebglUtils.js
- * MVnew.js do livro -- Interactive Computer Graphics
- * 
- * Esse programa foi baseado no exemplo cuboV do capítulo 4 do livro 
- * Interactive Computer Graphics - Angel & Shreiner.
- *
- */
-
 "use strict";
 
 // ==================================================================
@@ -69,6 +56,9 @@ const gaIndices = [
   0, 4, 1,
 ]
 
+/**
+ * um array com diferentes cores para cada vertice da piramide.
+ */
 const CORES = [
   // Front face
   [1.0, 0.0, 0.0, 1.0],
@@ -88,6 +78,9 @@ const CORES = [
   [0.0, 1.0, 0.0, 1.0]
 ];
 
+/**
+ * um array com as cores base principais
+ */
 const CORES_REDUZIDO = [
   vec4(0.0, 0.0, 0.0, 1.0),  // black
   vec4(1.0, 0.0, 0.0, 1.0),  // red
@@ -139,7 +132,7 @@ class Piramide {
   vtrans;
 
   constructor(pos, escala, theta, vtheta, vtrans) {
-    for (let i = 0; i < 5; i++) {
+    for (let i = 0; i < VERTICES_REDUZIDO.length; i++) {
       gaPosicoes.push(VERTICES_REDUZIDO[i])
     }
 
@@ -184,10 +177,7 @@ function main() {
   let vtheta = vec3(0, 0, 0);
   let vtrans = vec3(0, 0, 0);
   let piramide = new Piramide(pos, escala, theta, vtheta, vtrans);
-  console.log(piramide)
   gaPiramides.push(piramide);
-
-  console.log(gaPosicoes, gaCores)
 
   // shaders
   crieShaders();
@@ -270,7 +260,6 @@ function render() {
   gl.drawElements(gl.TRIANGLES, gaPiramides[0].numVertices, gl.UNSIGNED_BYTE, 0);
 
   window.requestAnimationFrame(render);
-
 }
 // ========================================================
 // Código fonte dos shaders em GLSL
