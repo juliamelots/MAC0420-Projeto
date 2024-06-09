@@ -21,6 +21,11 @@ const EIXO_X = 0;
 const EIXO_Y = 1;
 const EIXO_Z = 2;
 
+
+/**
+ * um array de vertices com todos os vertices usados em uma
+ * piramide de base triangular
+ */
 const VERTICES = [
   // Front face
   vec3(0.0,  1.0,  0.0),
@@ -40,6 +45,30 @@ const VERTICES = [
   vec3(-1.0, -1.0,  1.0)
 ];
 
+/**
+ * um array de vertices com todos os vertices usados em uma
+ * piramide de base triangular, mas sem repeticoes
+ */
+const VERTICES_REDUZIDO = [
+  vec3(0.0,  1.0,  0.0),    // 0 
+  vec3(-1.0, -1.0,  1.0),   // 1
+  vec3(1.0, -1.0,  1.0),    // 2
+  vec3(1.0, -1.0, -1.0),    // 3
+  vec3(-1.0, -1.0, -1.0),   // 4
+]
+
+/**
+ * um array de indices que fazem referencia a cada um dos vertices
+ * do array VERTICES_REDUZIDO. Cada linha se refere a uma face da
+ * piramide.
+ */
+const gaIndices = [
+  0, 1, 2,
+  0, 2, 3,
+  0, 3, 4,
+  0, 4, 1,
+]
+
 const CORES = [
   // Front face
   [1.0, 0.0, 0.0, 1.0],
@@ -58,6 +87,17 @@ const CORES = [
   [0.0, 0.0, 1.0, 1.0],
   [0.0, 1.0, 0.0, 1.0]
 ];
+
+const CORES_REDUZIDO = [
+  vec4(0.0, 0.0, 0.0, 1.0),  // black
+  vec4(1.0, 0.0, 0.0, 1.0),  // red
+  vec4(1.0, 1.0, 0.0, 1.0),  // yellow
+  vec4(0.0, 1.0, 0.0, 1.0),  // green
+  vec4(0.0, 0.0, 1.0, 1.0),  // blue
+  vec4(1.0, 0.0, 1.0, 1.0),  // magenta
+  vec4(1.0, 1.0, 1.0, 1.0),  // white
+  vec4(0.0, 1.0, 1.0, 1.0)   // cyan
+]
 
 // ==================================================================
 // variáveis globais
@@ -103,12 +143,12 @@ class Piramide {
   vtrans;
 
   constructor(pos, escala, theta, vtheta, vtrans) {
-    for (let i = 0; i < this.numVertices; i++) {
-      gaPosicoes.push(VERTICES[i])
+    for (let i = 0; i < 5; i++) {
+      gaPosicoes.push(VERTICES_REDUZIDO[i])
     }
 
     for (let i = 0; i < this.numVertices; i++) {
-      gaCores.push(CORES[i])
+      gaCores.push(CORES_REDUZIDO[2])
     }
 
     this.pos = pos;
@@ -152,21 +192,25 @@ function main() {
   console.log(piramide)
   gaPiramides.push(piramide);
 
+  console.log(gaPosicoes, gaCores)
+
   // shaders
+  //crieShaders();
   crieShaders();
 
   // finalmente...
   render();
 }
 
-// ==================================================================
-/**
- * cria e configura os shaders
- */
 function crieShaders() {
   //  cria o programa
   gShader.program = makeProgram(gl, gVertexShaderSrc, gFragmentShaderSrc);
   gl.useProgram(gShader.program);
+
+  // buffer dos índices dos vértices
+  var bufIndices = gl.createBuffer();
+  gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, bufIndices);
+  gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint8Array(gaIndices), gl.STATIC_DRAW);
 
   // buffer dos vértices
   var bufVertices = gl.createBuffer();
@@ -199,6 +243,7 @@ function crieShaders() {
   gCtx.vista = lookAt(EYE, AT, UP);
 }
 
+
 function atualiza() {
   gaPiramides[0].pos = add(gaPiramides[0].pos, gaPiramides[0].vtrans);
   gaPiramides[0].theta = add(gaPiramides[0].theta, gaPiramides[0].vtheta);
@@ -219,17 +264,14 @@ function render() {
 
   // escala
   let s = scale(gaPiramides[0].escala[0], gaPiramides[0].escala[1], gaPiramides[0].escala[2]);
-  
+
   // translacao
   let t = translate(gaPiramides[0].pos[0], gaPiramides[0].pos[1], gaPiramides[0].pos[2]);
-    
-  //let model = mult(t, s);
+
   let model = mult(t, mult(s, mult(rz, mult(rx, ry))));
 
   gl.uniformMatrix4fv(gShader.uModelView, false, flatten(mult(gCtx.vista, model)));
-  gl.drawArrays(gl.TRIANGLES, 0, gaPiramides[0].numVertices);
-
-  //window.requestAnimationFrame(render);
+  gl.drawElements(gl.TRIANGLES, gaPiramides[0].numVertices, gl.UNSIGNED_BYTE, 0);
 }
 // ========================================================
 // Código fonte dos shaders em GLSL
