@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <title>EP04 de MAC0420/MAC5744</title>
+    <script src="http://www.ime.usp.br/~hitoshi/mac0420/libs/MVnew.js"></script>
+    <script src="http://www.ime.usp.br/~hitoshi/mac0420/libs/macWebglUtils.js"></script>
+    <script src="./utils/entidades.js"></script>
+    <script src="./utils/poliedros.js"></script>
+    <script src="./utils/shader.js"></script>
+    <script src="script.js"></script>
+</head>
+
+<body>
+    <h1>EP04 - MAC0420/MAC5744 - Projeto</h1>
+    <p></p>
+    <hr>
+    <p></p>
+    <table>
+    <tr>
+        <td><input type="button" id= "bRun" value="Executar" /></td>
+        <td><input type="button" id= "bStep" value="Passo"/></td>
+    </tr> 
+    </table>
+   <p></p>
+    <hr>
+    <p></p>
+    <canvas id="glCanvas" width="400" height="400">
+        Opa! parece que seu navegador não suporta o canvas do HTML5.
+    </canvas>
+    <p></p>
+    <hr>
+    <p></p>
+    <h3>Teclas de controle:</h3>
+    <ul>
+        <li>K: zera a velocidade de translação</li>
+        <li>J: incrementa velocidade de translação</li>
+        <li>L: decrementa velocidade de translação</li>
+        <li>W: incrementa a rotação no eixo X, fazendo nariz da nave subir</li>
+        <li>X: decrementa a rotação no eixo X, fazendo nariz da nave descer</li>
+        <li>A: incrementa a rotação no eixo Y, fazendo a nave virar para esquerda</li>
+        <li>D: decrementa a rotação no eixo Y, fazendo a nave virar para direita</li>
+        <li>Z: incrementa a rotação no eixo Z, fazendo a nave girar no sentido anti-horário</li>
+        <li>C: decrementa a rotação no eixo Z, fazendo a nave girar no sentido horário</li>
+    </ul>
+    <hr>
+</body>
+
+</html>
