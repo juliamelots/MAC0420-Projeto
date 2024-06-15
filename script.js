@@ -64,7 +64,7 @@ function buildInterface() {
  * Registra os elementos do simulador de voo em seu objeto.
  */
 function buildSimulator() {
-    gSimulator.ship = new Camera(vec3(0, -1.25, 5), vec3(0, 0, 0));
+    gSimulator.ship = new Camera(vec3(0, -2, 5), vec3(0, 0, 0));
 
     let sol = new Elemento();
     sol.trans = vec3(0, 0, 10);
@@ -79,8 +79,8 @@ function buildSimulator() {
     // let e_poly = new Esfera(2);
     // let e_poly = new Cubo();
     let e = new Elemento(e_poly);
-    e.trans = vec3(0, 0, 0);
-    e.vTheta = vec3(0, 10, 0);
+    e.trans = vec3(0, 0, 1);
+    e.vTheta = vec3(10, 0, 0);
     e.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
     e.cor.difusa = vec4(1, 0, 1, 1);
     e.cor.especular = 50.0;

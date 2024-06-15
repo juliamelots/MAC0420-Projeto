@@ -23,9 +23,12 @@ class Shader {
             out vec3 vNormal;
 
             void main() {
-                vec4 position = vec4(aVertex, 1);
-                if (uIsShadow) { position = (uShadow * position) / (uLightTrans.z - position.z); }
-                position = uView * uModel * position;
+                vec4 position = uModel * vec4(aVertex, 1);
+                if (uIsShadow) {
+                    float normalizer = (uLightTrans.z - position.z);
+                    position = (uShadow * position) / normalizer;
+                }
+                position = uView * position;
                 gl_Position = uPerspective * position;
 
                 vNormal = mat3(uInvTrans) * aNormal;
@@ -64,7 +67,7 @@ class Shader {
 
                 outColor = diffusion + specular + uAmbient;
                 outColor.a = 1.0;
-                if (uIsShadow) { outColor = vec4(0, 1, 0, 1); }
+                if (uIsShadow) { outColor = vec4(0, 0, 0, 1); }
             }`;
     }
 
@@ -156,7 +159,7 @@ class Shader {
     renderiza(poliedro) {
         this.GL.uniform1i(this.uIsShadow, 0);
         this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
-        // this.GL.uniform1i(this.uIsShadow, 1);
-        // this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
+        this.GL.uniform1i(this.uIsShadow, 1);
+        this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
     }
 }
