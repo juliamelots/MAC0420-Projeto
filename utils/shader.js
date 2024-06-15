@@ -10,42 +10,52 @@ class Shader {
 
             uniform mat4 uPerspective;
             uniform mat4 uView;
+            uniform vec3 uLightTrans;
+
             uniform mat4 uModel;
             uniform mat4 uInvTrans;
 
-            uniform vec4 uColor;
-            uniform vec4 uLight;
-
-            out vec4 vColor;
-            out vec3 vNormal;
+            out vec3 vView;
             out vec3 vLight;
+            out vec3 vNormal;
 
             void main() {
-                gl_Position = uPerspective * uView * uModel * vec4(aVertex, 1);
+                vec4 position = uView * uModel * vec4(aVertex, 1);
+                gl_Position = uPerspective * position;
 
-                vColor = uColor;
                 vNormal = mat3(uInvTrans) * aNormal;
-                vLight = mat3(uView) * uLight.xyz;
+                vLight = (uView * vec4(uLightTrans, 1) - position).xyz;
+                vView = -(position.xyz);
             }`;
 
         this.fragmentShader = `#version 300 es
             precision highp float;
 
-            in vec4 vColor;
-            in vec3 vNormal;
+            in vec3 vView;
             in vec3 vLight;
+            in vec3 vNormal;
 
+            uniform vec4 uAmbient;
             uniform vec4 uDiffusion;
+            uniform vec4 uSpecular;
+            uniform float uAlpha;
 
             out vec4 outColor;
 
             void main() {
-                vec3 normal = normalize(vNormal);
-                vec3 normalLight = normalize(vLight);
-                float k = dot(normal, normalLight);
+                vec3 nNormal = normalize(vNormal);
+                vec3 nLight = normalize(vLight);
+                vec3 nView = normalize(vView);
+                vec3 nHalf = normalize(nLight + nView);
 
-                outColor = vColor;
-                if (k > 0.0) { outColor = k * uDiffusion; }
+                float kD = max(0.0, dot(nNormal, nLight));
+                vec4 diffusion = kD * uDiffusion;
+
+                float kS = pow(max(0.0, dot(nNormal, nHalf)), uAlpha);
+                vec4 specular = vec4(1, 0, 0, 1);
+                if (kD > 0.0) { specular = kS * uSpecular; }
+
+                outColor = diffusion + specular + uAmbient;
                 outColor.a = 1.0;
             }`;
     }
@@ -88,31 +98,47 @@ class Shader {
         // atributos uniformes
         this.uPerspective = GL.getUniformLocation(this.programa, "uPerspective");
         this.uView = GL.getUniformLocation(this.programa, "uView");
+        this.uLightTrans = GL.getUniformLocation(this.programa, "uLightTrans");
+
         this.uModel = GL.getUniformLocation(this.programa, "uModel");
         this.uInvTrans = GL.getUniformLocation(this.programa, "uInvTrans");
 
-        this.uColor = GL.getUniformLocation(this.programa, "uColor");
-        this.uLight = GL.getUniformLocation(this.programa, "uLight");
+        this.uAmbient = GL.getUniformLocation(this.programa, "uAmbient");
         this.uDiffusion = GL.getUniformLocation(this.programa, "uDiffusion");
+        this.uSpecular = GL.getUniformLocation(this.programa, "uSpecular");
+        this.uAlpha = GL.getUniformLocation(this.programa, "uAlpha");
 
         // atributos uniformes carregados apenas uma vez
         let perspectiva = perspective(60, 1, 0.1, 3000);
         GL.uniformMatrix4fv(this.uPerspective, false, flatten(perspectiva));
     }
 
+    /**
+     * Carrega uniformes válidos para toda cena, ou seja,
+     * que são únicos por frame com dados compactados.
+     */
     carregaUniformesGerais(dados) {
         this.GL.uniformMatrix4fv(this.uView, false, flatten(dados.view));
-        this.GL.uniform4fv(this.uLight, dados.light);
+        this.GL.uniform3fv(this.uLightTrans, dados.lightTrans);
     }
 
-    carregaUniformesEspecificos(dados) {
-        this.GL.uniformMatrix4fv(this.uModel, false, flatten(dados.model));
-        this.GL.uniformMatrix4fv(this.uInvTrans, false, flatten(dados.invTrans));
-        this.GL.uniform4fv(this.uColor, dados.color);
-        // TO-DO texture
-        this.GL.uniform4fv(this.uDiffusion, dados.diffusion);
+    /**
+     * Carrega uniformes para elemento da cena, ou seja,
+     * que variam em um mesmo frame com dados compactados.
+     */
+    carregaUniformesEspecificos(dadosModelo, dadosLuz) {
+        this.GL.uniformMatrix4fv(this.uModel, false, flatten(dadosModelo.model));
+        this.GL.uniformMatrix4fv(this.uInvTrans, false, flatten(dadosModelo.invTrans));
+        
+        this.GL.uniform4fv(this.uAmbient, dadosLuz.ambient);
+        this.GL.uniform4fv(this.uDiffusion, dadosLuz.diffusion);
+        this.GL.uniform4fv(this.uSpecular, dadosLuz.specular);
+        this.GL.uniform1f(this.uAlpha, dadosLuz.alpha);
     }
 
+    /**
+     * Renderiza poliedro utilizando uniformes previamente carregados.
+     */
     renderiza(poliedro) {
         this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
     }

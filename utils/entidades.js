@@ -42,7 +42,7 @@ class Camera {
 }
 
 class Elemento {
-    constructor(poliedro) {
+    constructor(poliedro = null) {
         // atributos físicos
         this.escala = vec3(1, 1, 1);
         this.trans = vec3(0, 0, 0);
@@ -50,11 +50,14 @@ class Elemento {
         this.theta = vec3(0, 0, 0);
         this.vTheta = vec3(0, 0, 0);
 
-        // TO-DO atributos gráficos
+        // atributos gráficos
         this.poliedro = poliedro;
-        this.cor = vec4(0, 0, 0, 1);
         this.textura = vec4(0, 0, 0, 1);
-        this.difusao = vec4(0.5, 1.0, 0.0, 1.0);
+        this.cor = {
+            ambiente: vec4(0, 0, 0, 1),
+            difusa: vec4(0, 0, 0, 1),
+            especular: 50.0,
+        };
     }
 
     atualizaTrans(deltaTempo) {
@@ -69,7 +72,7 @@ class Elemento {
         this.theta = add(this.theta, mult(deltaTempo, this.vTheta));
     }
 
-    renderiza(view) {
+    calculaUniformesModelo(view) {
         let escala = scale(this.escala[X], this.escala[Y], this.escala[Z]);
         let rotacao = rotateXYZ(this.theta[X], this.theta[Y], this.theta[Z]);
         let translacao = translate(this.trans[X], this.trans[Y], this.trans[Z]);
@@ -77,13 +80,21 @@ class Elemento {
         let model = mult(translacao, mult(rotacao, escala));
         let invTrans = transpose(inverse(mult(view, model)));
 
-        let dadosElemento = {
+        let dados = {
             model: model,
-            invTrans: invTrans,
-            color: this.cor,
-            texture: this.textura,
-            diffusion: this.difusao
+            invTrans: invTrans
         };
-        return dadosElemento;
+        return dados;
+    }
+
+    calculaUniformesLuz(alvo) {
+        // this é fonte de luz, alvo é material afetado
+        let dados = {
+            ambient: mult(this.cor.ambiente, alvo.cor.ambiente),
+            diffusion: mult(this.cor.difusa, alvo.cor.difusa),
+            specular: this.cor.especular,
+            alpha: alvo.cor.especular
+        };
+        return dados;
     }
 }

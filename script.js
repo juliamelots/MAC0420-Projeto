@@ -29,33 +29,6 @@ var gInterface = { theta: vec3(0.0, 0.0, 0.0) };
 var gSimulator = { time: 0.0, dt: 0.0 };
 
 /* ==================================================================
-  Classes
-*/
-/**
- * Representação do obstáculo, com escala, posição, angulação e velocidades (linear e angular).
- * Capaz de atualizar posição, angulação e velocidade linear.
- */
-class Obstacle {
-    constructor(polyhedron = null) {
-        this.polyhedron = polyhedron;
-        this.scale = vec3(1.0, 1.0, 1.0);
-        this.trans = vec3(0.0, 0.0, 0.0);
-        this.vtrans = vec3(0.0, 0.0, 0.0);
-        this.theta = vec3(0.0, 0.0, 0.0);
-        this.vtheta = vec3(0.0, 0.0, 0.0);
-    }
-    updateTrans() {
-        this.trans = add(this.trans, mult(gSimulator.dt, this.vtrans));
-    }
-    updateVTrans() {
-        this.vtrans[2] -= G * gSimulator.dt;
-    }
-    updateTheta() {
-        this.theta = add(this.theta, mult(gSimulator.dt, this.vtheta));
-    }
-}
-
-/* ==================================================================
   Funções principais
 */
 function main() {
@@ -92,6 +65,13 @@ function buildInterface() {
  */
 function buildSimulator() {
     gSimulator.ship = new Camera(vec3(-100, -100, 300), vec3());
+
+    let sol = new Elemento();
+    sol.trans = vec3(0, 0, 150);
+    sol.cor.ambiente = vec4(0.2, 0.2, 0.2, 1);
+    sol.cor.difusa = vec4(1, 1, 1, 1);
+    sol.cor.especular = vec4(1, 1, 1, 1);
+    gSimulator.sol = sol;
     
     gSimulator.obstacles = [];
 
@@ -100,7 +80,9 @@ function buildSimulator() {
     e.escala = vec3(30, 30, 30);
     e.trans = vec3(0, 0, 90);
     e.vTheta = vec3(10, 10, 10);
-    e.cor = COLOR[4];
+    e.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
+    e.cor.difusa = vec4(1, 0, 1, 1);
+    e.cor.especular = 50.0;
     gSimulator.obstacles.push(e);
 }
 
@@ -148,14 +130,15 @@ function nextFrame(e) {
     
     let dadosGeral = {
         view: gSimulator.ship.olha(),
-        light: vec4(1.0, 1.0, 1.0, 0.0)
+        lightTrans: gSimulator.sol.trans
     };
     gShader.carregaUniformesGerais(dadosGeral);
 
     for (let i = 0; i < gSimulator.obstacles.length; i++) {
         let e = gSimulator.obstacles.at(i);
-        let dadosElemento = e.renderiza(dadosGeral.view);
-        gShader.carregaUniformesEspecificos(dadosElemento);
+        let dadosModelo = e.calculaUniformesModelo(dadosGeral.view);
+        let dadosLuz = gSimulator.sol.calculaUniformesLuz(e);
+        gShader.carregaUniformesEspecificos(dadosModelo, dadosLuz);
         gShader.renderiza(e.poliedro);
     }
 
