@@ -5,7 +5,7 @@ class Poliedro {
     }
 
     calculaNormal(a, b, c) {
-        return vec3(cross(subtract(b, a), subtract(c, a)));
+        return vec3(cross(subtract(b, a), subtract(c, b)));
     }
 
     criaTriangulo(a, b, c) {
@@ -107,8 +107,8 @@ class Piramide extends Poliedro {
         this.criaTriangulo(verticesPiramide[0], verticesPiramide[4], verticesPiramide[1]);
 
         // base da pirâmide
-        this.criaTriangulo(verticesPiramide[1], verticesPiramide[2], verticesPiramide[3]);
-        this.criaTriangulo(verticesPiramide[1], verticesPiramide[3], verticesPiramide[4]);
+        this.criaTriangulo(verticesPiramide[3], verticesPiramide[2], verticesPiramide[1]);
+        this.criaTriangulo(verticesPiramide[4], verticesPiramide[3], verticesPiramide[1]);
         
         console.log("Pirâmide:\nVERTICES = ", this.nVertices,
             "\nSHADER = ", gShader.vertices.length);
@@ -119,29 +119,83 @@ class Cilindro extends Poliedro {
     constructor(nLados) {
         super();
 
-        // cria vértices da base do cilindro
+        // cria vértices da base e topo do cilindro
         let base = [];
-        let centroBase = vec3(0, 0, 0);
-        let centroTopo = vec3(0, 0, 1);
-        let ang = 2 * Math.PI / nLados;
-        for (let i = 0; i < nLados; i++)
-            base.push(vec3(Math.cos(ang * i), Math.sin(ang * i), 0));
+        let topo = [];
+        const ang = 2 * Math.PI / nLados;
+        for (let i = 0; i < nLados; i++) {
+            let x = Math.cos(ang * i);
+            let y = Math.sin(ang * i);
+            base.push(vec3(x, y, -0.5));
+            topo.push(vec3(x, y, 0.5));
+        }
+        
+        // cria face base do cilindro
+        let centroBase = vec3(0, 0, -0.5);
+        for (let i = 0; i < nLados; i++) {
+            let vBase = base.at(i);
+            let uBase = base.at((i + 1) % nLados);
+            this.criaTriangulo(vBase, centroBase, uBase);
+        }
 
-        // cria faces do cilindro
+        // cria face topo do cilindro
+        let centroTopo = vec3(0, 0, 0.5);
+        for (let i = 0; i < nLados; i++) {
+            let vTopo= topo.at(i);
+            let uTopo = topo.at((i + 1) % nLados);
+            this.criaTriangulo(uTopo, centroTopo, vTopo);
+        }
+
+        // cria faces laterais do cilindro
         for (let i = 0; i < nLados; i++) {
             // vértices que compõem as faces
             let vBase = base.at(i);
-            let vTopo = vec3(vBase[X], vBase[Y], 1);
+            let vTopo = topo.at(i);
             let uBase = base.at((i + 1) % nLados);
-            let uTopo = vec3(uBase[X], uBase[Y], 1);
+            let uTopo = topo.at((i + 1) % nLados);
 
-            this.criaTriangulo(vBase, vTopo, uBase);        // 1° triângulo do corpo
-            this.criaTriangulo(uBase, vTopo, uTopo);        // 2° triângulo do corpo
-            this.criaTriangulo(vBase, centroBase, uBase);   // triângulo da base
-            this.criaTriangulo(vTopo, centroTopo, uTopo);   // triângulo do topo
+            this.criaTriangulo(uBase, vTopo, vBase); // 1° triângulo do corpo
+            this.criaTriangulo(uTopo, vTopo, uBase); // 2° triângulo do corpo
         }
 
         console.log("Cilindro:\nVERTICES = ", this.nVertices,
+            "\nSHADER = ", gShader.vertices.length);
+    }
+}
+
+class Cubo extends Poliedro {
+    constructor() {
+        super();
+        let verticesCubo = [
+            vec3(-0.5, -0.5, 0.5),
+            vec3(-0.5, 0.5, 0.5),
+            vec3(0.5, 0.5, 0.5),
+            vec3(0.5, -0.5, 0.5),
+            vec3(-0.5, -0.5, -0.5),
+            vec3(-0.5, 0.5, -0.5),
+            vec3(0.5, 0.5, -0.5),
+            vec3(0.5, -0.5, -0.5)
+        ];
+
+        this.criaTriangulo(verticesCubo[1], verticesCubo[0], verticesCubo[3]);
+        this.criaTriangulo(verticesCubo[1], verticesCubo[3], verticesCubo[2]);
+
+        this.criaTriangulo(verticesCubo[2], verticesCubo[3], verticesCubo[7]);
+        this.criaTriangulo(verticesCubo[2], verticesCubo[7], verticesCubo[6]);
+
+        this.criaTriangulo(verticesCubo[3], verticesCubo[0], verticesCubo[4]);
+        this.criaTriangulo(verticesCubo[3], verticesCubo[4], verticesCubo[7]);
+
+        this.criaTriangulo(verticesCubo[6], verticesCubo[5], verticesCubo[1]);
+        this.criaTriangulo(verticesCubo[6], verticesCubo[1], verticesCubo[2]);
+
+        this.criaTriangulo(verticesCubo[4], verticesCubo[5], verticesCubo[6]);
+        this.criaTriangulo(verticesCubo[4], verticesCubo[6], verticesCubo[7]);
+
+        this.criaTriangulo(verticesCubo[5], verticesCubo[4], verticesCubo[0]);
+        this.criaTriangulo(verticesCubo[5], verticesCubo[0], verticesCubo[1]);
+
+        console.log("Cubo:\nVERTICES = ", this.nVertices,
             "\nSHADER = ", gShader.vertices.length);
     }
 }

@@ -64,10 +64,10 @@ function buildInterface() {
  * Registra os elementos do simulador de voo em seu objeto.
  */
 function buildSimulator() {
-    gSimulator.ship = new Camera(vec3(-100, -100, 300), vec3());
+    gSimulator.ship = new Camera(vec3(0, -1.25, 5), vec3(0, 0, 0));
 
     let sol = new Elemento();
-    sol.trans = vec3(0, 0, 150);
+    sol.trans = vec3(0, 0, 10);
     sol.cor.ambiente = vec4(0.2, 0.2, 0.2, 1);
     sol.cor.difusa = vec4(1, 1, 1, 1);
     sol.cor.especular = vec4(1, 1, 1, 1);
@@ -76,10 +76,11 @@ function buildSimulator() {
     gSimulator.obstacles = [];
 
     let e_poly = new Cilindro(8);
+    // let e_poly = new Esfera(2);
+    // let e_poly = new Cubo();
     let e = new Elemento(e_poly);
-    e.escala = vec3(30, 30, 30);
-    e.trans = vec3(0, 0, 90);
-    e.vTheta = vec3(10, 10, 10);
+    e.trans = vec3(0, 0, 0);
+    e.vTheta = vec3(0, 10, 0);
     e.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
     e.cor.difusa = vec4(1, 0, 1, 1);
     e.cor.especular = 50.0;
@@ -130,7 +131,8 @@ function nextFrame(e) {
     
     let dadosGeral = {
         view: gSimulator.ship.olha(),
-        lightTrans: gSimulator.sol.trans
+        lightTrans: gSimulator.sol.trans,
+        shadow: gSimulator.sol.calculaSombra()
     };
     gShader.carregaUniformesGerais(dadosGeral);
 

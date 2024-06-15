@@ -12,10 +12,7 @@ class Camera {
         this.cima = vec3(0, 1, 0);
         this.frente = vec3(0, 0, 1);
 
-        this.rotaciona(theta);
-        // console.log("Sistema de coordenadas da câmera:\nCIMA = ", this.sisCoord.cima,
-        //     "\nFRENTE = ", this.sisCoord.frente,
-        //     "\nDIREITA = ", this.sisCoord.direita);
+        this.atualizaTheta(theta);
     }
 
     atualizaTrans(deltaTempo) {
@@ -96,5 +93,17 @@ class Elemento {
             alpha: alvo.cor.especular
         };
         return dados;
+    }
+
+    calculaSombra() {
+        let proj = mat4();
+        proj[0][0] = this.trans[Z];
+        proj[1][1] = this.trans[Z];
+        proj[3][3] = this.trans[Z];
+        proj[0][2] = -this.trans[X];
+        proj[1][2] = -this.trans[Y];
+        proj[2][2] = 0;
+        proj[3][2] = -1;
+        return proj;
     }
 }

@@ -12,6 +12,9 @@ class Shader {
             uniform mat4 uView;
             uniform vec3 uLightTrans;
 
+            uniform bool uIsShadow;
+            uniform mat4 uShadow;
+
             uniform mat4 uModel;
             uniform mat4 uInvTrans;
 
@@ -20,7 +23,9 @@ class Shader {
             out vec3 vNormal;
 
             void main() {
-                vec4 position = uView * uModel * vec4(aVertex, 1);
+                vec4 position = vec4(aVertex, 1);
+                if (uIsShadow) { position = (uShadow * position) / (uLightTrans.z - position.z); }
+                position = uView * uModel * position;
                 gl_Position = uPerspective * position;
 
                 vNormal = mat3(uInvTrans) * aNormal;
@@ -34,6 +39,8 @@ class Shader {
             in vec3 vView;
             in vec3 vLight;
             in vec3 vNormal;
+
+            uniform bool uIsShadow;
 
             uniform vec4 uAmbient;
             uniform vec4 uDiffusion;
@@ -52,11 +59,12 @@ class Shader {
                 vec4 diffusion = kD * uDiffusion;
 
                 float kS = pow(max(0.0, dot(nNormal, nHalf)), uAlpha);
-                vec4 specular = vec4(1, 0, 0, 1);
+                vec4 specular = vec4(0, 0, 0, 1);
                 if (kD > 0.0) { specular = kS * uSpecular; }
 
                 outColor = diffusion + specular + uAmbient;
                 outColor.a = 1.0;
+                if (uIsShadow) { outColor = vec4(0, 1, 0, 1); }
             }`;
     }
 
@@ -79,6 +87,7 @@ class Shader {
         this.bufVertices = GL.createBuffer();
         GL.bindBuffer(GL.ARRAY_BUFFER, this.bufVertices);
         GL.bufferData(GL.ARRAY_BUFFER, flatten(this.vertices), GL.STATIC_DRAW);
+        console.log("Vertices: ", this.vertices.length);
         
         // configuração de leitura do buffer de vértices
         let aVertex = GL.getAttribLocation(this.programa, "aVertex");
@@ -89,6 +98,7 @@ class Shader {
         this.bufNormais = GL.createBuffer();
         GL.bindBuffer(GL.ARRAY_BUFFER, this.bufNormais);
         GL.bufferData(GL.ARRAY_BUFFER, flatten(this.normais), GL.STATIC_DRAW);
+        console.log("Normais: ", this.normais.length);
 
         // configuração de leitura do buffer de normais
         let aNormal = GL.getAttribLocation(this.programa, "aNormal");
@@ -98,6 +108,9 @@ class Shader {
         // atributos uniformes
         this.uPerspective = GL.getUniformLocation(this.programa, "uPerspective");
         this.uView = GL.getUniformLocation(this.programa, "uView");
+
+        this.uShadow = GL.getUniformLocation(this.programa, "uShadow");
+        this.uIsShadow = GL.getUniformLocation(this.programa, "uIsShadow");
         this.uLightTrans = GL.getUniformLocation(this.programa, "uLightTrans");
 
         this.uModel = GL.getUniformLocation(this.programa, "uModel");
@@ -120,6 +133,7 @@ class Shader {
     carregaUniformesGerais(dados) {
         this.GL.uniformMatrix4fv(this.uView, false, flatten(dados.view));
         this.GL.uniform3fv(this.uLightTrans, dados.lightTrans);
+        this.GL.uniformMatrix4fv(this.uShadow, false, flatten(dados.shadow));
     }
 
     /**
@@ -140,6 +154,9 @@ class Shader {
      * Renderiza poliedro utilizando uniformes previamente carregados.
      */
     renderiza(poliedro) {
+        this.GL.uniform1i(this.uIsShadow, 0);
         this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
+        // this.GL.uniform1i(this.uIsShadow, 1);
+        // this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
     }
 }
