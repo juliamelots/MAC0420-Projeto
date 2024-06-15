@@ -27,13 +27,20 @@ class Shader {
                 if (uIsShadow) {
                     float normalizer = (uLightTrans.z - position.z);
                     position = (uShadow * position) / normalizer;
-                }
-                position = uView * position;
-                gl_Position = uPerspective * position;
+                    gl_Position = uPerspective * uView * position;
 
-                vNormal = mat3(uInvTrans) * aNormal;
-                vLight = (uView * vec4(uLightTrans, 1) - position).xyz;
-                vView = -(position.xyz);
+                    vNormal = vec3(0, 0, 0);
+                    vLight = vec3(0, 0, 0);
+                    vView = vec3(0, 0, 0);
+                }
+                else {
+                    position = uView * position;
+                    gl_Position = uPerspective * position;
+
+                    vNormal = mat3(uInvTrans) * aNormal;
+                    vLight = (uView * vec4(uLightTrans, 1) - position).xyz;
+                    vView = -(position.xyz);
+                }
             }`;
 
         this.fragmentShader = `#version 300 es
@@ -51,23 +58,27 @@ class Shader {
             uniform float uAlpha;
 
             out vec4 outColor;
-
+            
             void main() {
-                vec3 nNormal = normalize(vNormal);
-                vec3 nLight = normalize(vLight);
-                vec3 nView = normalize(vView);
-                vec3 nHalf = normalize(nLight + nView);
+                if (uIsShadow) {
+                    outColor = vec4(0, 0, 0, 1);
+                }
+                else {
+                    vec3 nNormal = normalize(vNormal);
+                    vec3 nLight = normalize(vLight);
+                    vec3 nView = normalize(vView);
+                    vec3 nHalf = normalize(nLight + nView);
 
-                float kD = max(0.0, dot(nNormal, nLight));
-                vec4 diffusion = kD * uDiffusion;
+                    float kD = max(0.0, dot(nNormal, nLight));
+                    vec4 diffusion = kD * uDiffusion;
 
-                float kS = pow(max(0.0, dot(nNormal, nHalf)), uAlpha);
-                vec4 specular = vec4(0, 0, 0, 1);
-                if (kD > 0.0) { specular = kS * uSpecular; }
+                    float kS = pow(max(0.0, dot(nNormal, nHalf)), uAlpha);
+                    vec4 specular = vec4(0, 0, 0, 1);
+                    if (kD > 0.0) { specular = kS * uSpecular; }
 
-                outColor = diffusion + specular + uAmbient;
-                outColor.a = 1.0;
-                if (uIsShadow) { outColor = vec4(0, 0, 0, 1); }
+                    outColor = diffusion + specular + uAmbient;
+                    outColor.a = 1.0;
+                }
             }`;
     }
 
