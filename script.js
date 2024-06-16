@@ -23,6 +23,15 @@ const COLOR = [vec4(0.0, 0.0, 0.0, 1.0),    // black    0
     vec4(0.0, 0.0, 1.0, 1.0),               // blue     6
     vec4(1.0, 1.0, 0.0, 1.0)];              // yellow   7
 
+const urlTextura = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flower_poster_2.jpg/1200px-Flower_poster_2.jpg";
+
+var vTextura = [
+    vec2(0.0, 0.0),
+    vec2(0.0, 1.0),
+    vec2(1.0, 1.0),
+    vec2(1.0, 0.0)
+];
+
 var gGL;
 var gShader = new Shader();
 var gInterface = { theta: vec3(0.0, 0.0, 0.0) };
@@ -75,7 +84,7 @@ function buildSimulator() {
     
     gSimulator.obstacles = [];
 
-    let e_poly = new Cilindro(8);
+    let e_poly = new Cubo(1);
     // let e_poly = new Esfera(2);
     // let e_poly = new Cubo();
     let e = new Elemento(e_poly);
@@ -91,7 +100,7 @@ function buildSimulator() {
  * Cria e configura shaders de WebGL 2.0.
  */
 function createShaders() {
-    gShader.criaShaders(gGL, gInterface.canvas.height, gInterface.canvas.width);
+    gShader.criaShaders(gGL, gInterface.canvas.height, gInterface.canvas.width, urlTextura);
 }
 
 /**

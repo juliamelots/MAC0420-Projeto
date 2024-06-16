@@ -3,10 +3,12 @@ class Shader {
         this.nVertices = 0;
         this.vertices = [];
         this.normais = [];
+        this.texCoords = [];
 
         this.vertexShader = `#version 300 es
             in vec3 aVertex;
             in vec3 aNormal;
+            in vec2 aTexCoord;
 
             uniform mat4 uPerspective;
             uniform mat4 uView;
@@ -18,9 +20,12 @@ class Shader {
             uniform mat4 uModel;
             uniform mat4 uInvTrans;
 
+            uniform bool uHasTexture;
+
             out vec3 vView;
             out vec3 vLight;
             out vec3 vNormal;
+            out vec2 vTexCoord;
 
             void main() {
                 vec4 position = uModel * vec4(aVertex, 1);
@@ -32,6 +37,7 @@ class Shader {
                     vNormal = vec3(0, 0, 0);
                     vLight = vec3(0, 0, 0);
                     vView = vec3(0, 0, 0);
+                    vTexCoord = aTexCoord;
                 }
                 else {
                     position = uView * position;
@@ -40,6 +46,7 @@ class Shader {
                     vNormal = mat3(uInvTrans) * aNormal;
                     vLight = (uView * vec4(uLightTrans, 1) - position).xyz;
                     vView = -(position.xyz);
+                    vTexCoord = aTexCoord;
                 }
             }`;
 
@@ -49,6 +56,7 @@ class Shader {
             in vec3 vView;
             in vec3 vLight;
             in vec3 vNormal;
+            in vec2 vTexCoord;
 
             uniform bool uIsShadow;
 
@@ -56,6 +64,9 @@ class Shader {
             uniform vec4 uDiffusion;
             uniform vec4 uSpecular;
             uniform float uAlpha;
+
+            uniform bool uHasTexture;
+            uniform sampler2D uTextureMap;
 
             out vec4 outColor;
             
@@ -76,8 +87,15 @@ class Shader {
                     vec4 specular = vec4(0, 0, 0, 1);
                     if (kD > 0.0) { specular = kS * uSpecular; }
 
-                    outColor = diffusion + specular + uAmbient;
-                    outColor.a = 1.0;
+                    vec4 baseColor = uAmbient + diffusion + specular;
+                    baseColor.a = 1.0;
+                    
+                    if (uHasTexture) {
+                        vec4 textureColor = texture(uTextureMap, vTexCoord);
+                        outColor = baseColor * textureColor;
+                    } else {
+                        outColor = baseColor;
+                    }
                 }
             }`;
     }
@@ -85,7 +103,7 @@ class Shader {
     /**
      * Cria e configura shaders de WebGL 2.0.
      */
-    criaShaders(GL, altura, largura) {
+    criaShaders(GL, altura, largura, url) {
         // inicializa
         this.GL = GL;
         GL.viewport(0, 0, largura, altura);
@@ -118,7 +136,20 @@ class Shader {
         let aNormal = GL.getAttribLocation(this.programa, "aNormal");
         GL.vertexAttribPointer(aNormal, 3, GL.FLOAT, false, 0, 0);
         GL.enableVertexAttribArray(aNormal);
-        
+
+        // buffer de texturas
+        this.bufTextura = GL.createBuffer();
+        GL.bindBuffer(GL.ARRAY_BUFFER, this.bufTextura);
+        GL.bufferData(GL.ARRAY_BUFFER, flatten(this.texCoords), GL.STATIC_DRAW);
+
+        // configuração de leitura do buffer de texturas
+        let aTexCoord = GL.getAttribLocation(this.programa, "aTexCoord");
+        GL.vertexAttribPointer(aTexCoord, 2, GL.FLOAT, false, 0, 0);
+        GL.enableVertexAttribArray(aTexCoord);
+
+        this.configureTexturaDaURL(url, this.GL);
+        GL.uniform1i(GL.getUniformLocation(this.programa, "uTextureMap"), 0);
+
         // atributos uniformes
         this.uPerspective = GL.getUniformLocation(this.programa, "uPerspective");
         this.uView = GL.getUniformLocation(this.programa, "uView");
@@ -134,6 +165,8 @@ class Shader {
         this.uDiffusion = GL.getUniformLocation(this.programa, "uDiffusion");
         this.uSpecular = GL.getUniformLocation(this.programa, "uSpecular");
         this.uAlpha = GL.getUniformLocation(this.programa, "uAlpha");
+
+        this.uHasTexture = GL.getUniformLocation(this.programa, "uHasTexture");
 
         // atributos uniformes carregados apenas uma vez
         let perspectiva = perspective(60, 1, 0.1, 3000);
@@ -169,8 +202,44 @@ class Shader {
      */
     renderiza(poliedro) {
         this.GL.uniform1i(this.uIsShadow, 0);
+        this.GL.uniform1i(this.uHasTexture, poliedro.temTextura);
         this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
         this.GL.uniform1i(this.uIsShadow, 1);
+        this.GL.uniform1i(this.uHasTexture, 0);
         this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
     }
+
+    /**
+     * Recebe URL de imagem e configura sua textura
+     */
+    configureTexturaDaURL(url, gl) {
+        // cria a textura
+        var texture = gl.createTexture();
+        // seleciona a unidade TEXTURE0
+        gl.activeTexture(gl.TEXTURE0);
+        // ativa a textura
+        gl.bindTexture(gl.TEXTURE_2D, texture);
+      
+        // Carrega uma textura de um pixel 1x1 vermelho, temporariamente
+        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
+          new Uint8Array([255, 0, 0, 255]));
+      
+        // Carraga a imagem da URL: 
+        // veja https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/Image
+        var img = new Image(); // cria um bitmap
+        img.src = url;
+        img.crossOrigin = "anonymous";
+        // espera carregar = evento "load"
+        img.addEventListener('load', function () {
+          console.log("Carregou imagem", img.width, img.height);
+          // depois de carregar, copiar para a textura
+          gl.bindTexture(gl.TEXTURE_2D, texture);
+          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, img.width, img.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, img);
+          gl.generateMipmap(gl.TEXTURE_2D);
+          // experimente usar outros filtros removendo o comentário da linha abaixo.
+          //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
+        }
+        );
+        return img;
+      };
 }
