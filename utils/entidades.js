@@ -39,7 +39,7 @@ class Camera {
 }
 
 class Elemento {
-    constructor(poliedro = null) {
+    constructor(poliedro = null, gl, urlTextura) {
         // atributos físicos
         this.escala = vec3(1, 1, 1);
         this.trans = vec3(0, 0, 0);
@@ -49,7 +49,9 @@ class Elemento {
 
         // atributos gráficos
         this.poliedro = poliedro;
-        this.textura = vec4(0, 0, 0, 1);
+        this.temTextura = urlTextura != null;
+        this.textura = gl.createTexture();
+        this.img = this.carregaImagem(urlTextura);
         this.cor = {
             ambiente: vec4(0, 0, 0, 1),
             difusa: vec4(0, 0, 0, 1),
@@ -93,6 +95,22 @@ class Elemento {
             alpha: alvo.cor.especular
         };
         return dados;
+    }
+
+    calculaUniformesMaterial() {
+        let dados = {
+            textura: this.textura,
+            img: this.img,
+            temTextura: this.temTextura
+        }
+        return dados;
+    }
+
+    carregaImagem(url) {
+        var img = new Image(); // cria um bitmap
+        img.src = url;
+        img.crossOrigin = "anonymous";
+        return img;
     }
 
     calculaSombra() {

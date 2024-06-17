@@ -147,7 +147,6 @@ class Shader {
         GL.vertexAttribPointer(aTexCoord, 2, GL.FLOAT, false, 0, 0);
         GL.enableVertexAttribArray(aTexCoord);
 
-        this.configureTexturaDaURL(url, this.GL);
         GL.uniform1i(GL.getUniformLocation(this.programa, "uTextureMap"), 0);
 
         // atributos uniformes
@@ -187,7 +186,7 @@ class Shader {
      * Carrega uniformes para elemento da cena, ou seja,
      * que variam em um mesmo frame com dados compactados.
      */
-    carregaUniformesEspecificos(dadosModelo, dadosLuz) {
+    carregaUniformesEspecificos(dadosModelo, dadosLuz, dadosMaterial) {
         this.GL.uniformMatrix4fv(this.uModel, false, flatten(dadosModelo.model));
         this.GL.uniformMatrix4fv(this.uInvTrans, false, flatten(dadosModelo.invTrans));
         
@@ -195,6 +194,18 @@ class Shader {
         this.GL.uniform4fv(this.uDiffusion, dadosLuz.diffusion);
         this.GL.uniform4fv(this.uSpecular, dadosLuz.specular);
         this.GL.uniform1f(this.uAlpha, dadosLuz.alpha);
+
+        this.GL.activeTexture(this.GL.TEXTURE0);
+        this.GL.bindTexture(this.GL.TEXTURE_2D, dadosMaterial.textura);
+
+        if (!dadosMaterial.img.complete || !dadosMaterial.temTextura) {
+            this.GL.texImage2D(this.GL.TEXTURE_2D, 0, this.GL.RGBA, 1, 1, 0, this.GL.RGBA, this.GL.UNSIGNED_BYTE,
+                new Uint8Array([255, 0, 0, 255]));
+        }
+        else {
+            this.GL.texImage2D(this.GL.TEXTURE_2D, 0, this.GL.RGBA, dadosMaterial.img.width, dadosMaterial.img.height, 0, this.GL.RGBA, this.GL.UNSIGNED_BYTE, dadosMaterial.img);
+            this.GL.generateMipmap(this.GL.TEXTURE_2D);
+        }
     }
 
     /**
@@ -208,38 +219,4 @@ class Shader {
         this.GL.uniform1i(this.uHasTexture, 0);
         this.GL.drawArrays(gGL.TRIANGLES, poliedro.inicio, poliedro.nVertices);
     }
-
-    /**
-     * Recebe URL de imagem e configura sua textura
-     */
-    configureTexturaDaURL(url, gl) {
-        // cria a textura
-        var texture = gl.createTexture();
-        // seleciona a unidade TEXTURE0
-        gl.activeTexture(gl.TEXTURE0);
-        // ativa a textura
-        gl.bindTexture(gl.TEXTURE_2D, texture);
-      
-        // Carrega uma textura de um pixel 1x1 vermelho, temporariamente
-        gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, 1, 1, 0, gl.RGBA, gl.UNSIGNED_BYTE,
-          new Uint8Array([255, 0, 0, 255]));
-      
-        // Carraga a imagem da URL: 
-        // veja https://developer.mozilla.org/en-US/docs/Web/API/HTMLImageElement/Image
-        var img = new Image(); // cria um bitmap
-        img.src = url;
-        img.crossOrigin = "anonymous";
-        // espera carregar = evento "load"
-        img.addEventListener('load', function () {
-          console.log("Carregou imagem", img.width, img.height);
-          // depois de carregar, copiar para a textura
-          gl.bindTexture(gl.TEXTURE_2D, texture);
-          gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, img.width, img.height, 0, gl.RGBA, gl.UNSIGNED_BYTE, img);
-          gl.generateMipmap(gl.TEXTURE_2D);
-          // experimente usar outros filtros removendo o comentário da linha abaixo.
-          //gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-        }
-        );
-        return img;
-      };
 }
