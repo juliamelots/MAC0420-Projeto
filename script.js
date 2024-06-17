@@ -23,6 +23,16 @@ const COLOR = [vec4(0.0, 0.0, 0.0, 1.0),    // black    0
     vec4(0.0, 0.0, 1.0, 1.0),               // blue     6
     vec4(1.0, 1.0, 0.0, 1.0)];              // yellow   7
 
+const urlTextura = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flower_poster_2.jpg/1200px-Flower_poster_2.jpg";
+const urlTextura2 = "https://veja.abril.com.br/wp-content/uploads/2016/12/xadrez-tabuleiro.gif";
+
+var vTextura = [
+    vec2(0.0, 0.0),
+    vec2(0.0, 1.0),
+    vec2(1.0, 1.0),
+    vec2(1.0, 0.0)
+];
+
 var gGL;
 var gShader = new Shader();
 var gInterface = { theta: vec3(0.0, 0.0, 0.0) };
@@ -66,7 +76,7 @@ function buildInterface() {
 function buildSimulator() {
     gSimulator.ship = new Camera(vec3(0, -2, 5), vec3(0, 0, 0));
 
-    let sol = new Elemento();
+    let sol = new Elemento(null, gGL, null);
     sol.trans = vec3(0, 0, 10);
     sol.cor.ambiente = vec4(0.2, 0.2, 0.2, 1);
     sol.cor.difusa = vec4(1, 1, 1, 1);
@@ -75,23 +85,34 @@ function buildSimulator() {
     
     gSimulator.obstacles = [];
 
-    let e_poly = new Cilindro(8);
+    let e_poly = new Cubo(1);
     // let e_poly = new Esfera(2);
     // let e_poly = new Cubo();
-    let e = new Elemento(e_poly);
+    let e = new Elemento(e_poly, gGL, urlTextura);
     e.trans = vec3(0, 0, 1);
     e.vTheta = vec3(10, 0, 0);
     e.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
     e.cor.difusa = vec4(1, 0, 1, 1);
     e.cor.especular = 50.0;
     gSimulator.obstacles.push(e);
+
+    let e_poly2 = new Cubo(1);
+    // let e_poly = new Esfera(2);
+    // let e_poly = new Cubo();
+    let e2 = new Elemento(e_poly2, gGL, urlTextura2);
+    e2.trans = vec3(0, -2, 1);
+    e2.vTheta = vec3(10, 0, 0);
+    e2.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
+    e2.cor.difusa = vec4(1, 0, 1, 1);
+    e2.cor.especular = 50.0;
+    gSimulator.obstacles.push(e2);
 }
 
 /**
  * Cria e configura shaders de WebGL 2.0.
  */
 function createShaders() {
-    gShader.criaShaders(gGL, gInterface.canvas.height, gInterface.canvas.width);
+    gShader.criaShaders(gGL, gInterface.canvas.height, gInterface.canvas.width, urlTextura);
 }
 
 /**
@@ -140,7 +161,8 @@ function nextFrame(e) {
         let e = gSimulator.obstacles.at(i);
         let dadosModelo = e.calculaUniformesModelo(dadosGeral.view);
         let dadosLuz = gSimulator.sol.calculaUniformesLuz(e);
-        gShader.carregaUniformesEspecificos(dadosModelo, dadosLuz);
+        let dadosMaterial = e.calculaUniformesMaterial();
+        gShader.carregaUniformesEspecificos(dadosModelo, dadosLuz, dadosMaterial);
         gShader.renderiza(e.poliedro);
     }
 
