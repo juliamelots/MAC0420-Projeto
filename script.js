@@ -96,7 +96,7 @@ function buildSimulator() {
     e.cor.especular = 50.0;
     gSimulator.obstacles.push(e);
 
-    let e_poly2 = new Cubo(1);
+    let e_poly2 = new Cilindro(8, 1);
     // let e_poly = new Esfera(2);
     // let e_poly = new Cubo();
     let e2 = new Elemento(e_poly2, gGL, urlTextura2);

@@ -92,17 +92,18 @@ class Esfera extends Poliedro {
             let a = normalize(vertices[indices[i][0]]);
             let b = normalize(vertices[indices[i][1]]);
             let c = normalize(vertices[indices[i][2]]);
-            let texA = this.pegaTexCoords(a);
-            let texB = this.pegaTexCoords(b);
-            let texC = this.pegaTexCoords(c);
+            let texA = this.esferaTexCoords(a);
+            let texB = this.esferaTexCoords(b);
+            let texC = this.esferaTexCoords(c);
             this.subdivideTriangulo(a, b, c, texA, texB, texC, this.subdivisoes);
         }
     }
 
-    pegaTexCoords(v) {
-        let coord_u = 0.5 + (Math.atan2(v[2], v[0]) / (2 * Math.PI));
-        let coord_v = 0.5 - (Math.asin(v[1]) / Math.PI);
-        return vec2(coord_u, coord_v);
+    esferaTexCoords(d) {
+        let u = 0.5 + (Math.atan2(d[2], d[0])) / (2 * Math.PI);
+        let v = 0.5 + (Math.asin(d[1]) / Math.PI);
+        
+        return vec2(u, v);
     }
 }
 
@@ -118,21 +119,29 @@ class Piramide extends Poliedro {
             vec3(-1.0, -1.0, -1.0),   // 4
         ];
 
-        let texCoordsPiramide = [
+        let texCoordsFacesLateraisPiramide = [
             vec2(0.5, 1.0),   // topo
             vec2(0.0, 0.0),   // canto esquerdo
             vec2(1.0, 0.0),   // canto direito
         ];
 
+        let texCoordsBasePiramide = [
+            vec2(0.0, 0.0),   // canto inferior esquerdo
+            vec2(1.0, 0.0),   // canto inferior direito
+            vec2(1.0, 1.0),   // canto superior direito
+            vec2(0.0, 1.0)    // canto superior esquerdo
+        ];
+
         // faces superiores da pirâmide
-        this.criaTriangulo(verticesPiramide[0], verticesPiramide[1], verticesPiramide[2], texCoordsPiramide[0], texCoordsPiramide[1], texCoordsPiramide[2]);
-        this.criaTriangulo(verticesPiramide[0], verticesPiramide[2], verticesPiramide[3], texCoordsPiramide[0], texCoordsPiramide[1], texCoordsPiramide[2]);
-        this.criaTriangulo(verticesPiramide[0], verticesPiramide[3], verticesPiramide[4], texCoordsPiramide[0], texCoordsPiramide[1], texCoordsPiramide[2]);
-        this.criaTriangulo(verticesPiramide[0], verticesPiramide[4], verticesPiramide[1], texCoordsPiramide[0], texCoordsPiramide[1], texCoordsPiramide[2]);
+        this.criaTriangulo(verticesPiramide[0], verticesPiramide[1], verticesPiramide[2], texCoordsFacesLateraisPiramide[0], texCoordsFacesLateraisPiramide[1], texCoordsFacesLateraisPiramide[2]);
+        this.criaTriangulo(verticesPiramide[0], verticesPiramide[2], verticesPiramide[3], texCoordsFacesLateraisPiramide[0], texCoordsFacesLateraisPiramide[1], texCoordsFacesLateraisPiramide[2]);
+        this.criaTriangulo(verticesPiramide[0], verticesPiramide[3], verticesPiramide[4], texCoordsFacesLateraisPiramide[0], texCoordsFacesLateraisPiramide[1], texCoordsFacesLateraisPiramide[2]);
+        this.criaTriangulo(verticesPiramide[0], verticesPiramide[4], verticesPiramide[1], texCoordsFacesLateraisPiramide[0], texCoordsFacesLateraisPiramide[1], texCoordsFacesLateraisPiramide[2]);
 
         // base da pirâmide
-        this.criaTriangulo(verticesPiramide[3], verticesPiramide[2], verticesPiramide[1], texCoordsPiramide[0], texCoordsPiramide[1], texCoordsPiramide[2]);
-        this.criaTriangulo(verticesPiramide[4], verticesPiramide[3], verticesPiramide[1], texCoordsPiramide[0], texCoordsPiramide[1], texCoordsPiramide[2]);
+        this.criaTriangulo(verticesPiramide[3], verticesPiramide[2], verticesPiramide[1], texCoordsBasePiramide[2], texCoordsBasePiramide[1], texCoordsBasePiramide[0]);
+        this.criaTriangulo(verticesPiramide[4], verticesPiramide[3], verticesPiramide[1], texCoordsBasePiramide[3], texCoordsBasePiramide[2], texCoordsBasePiramide[0]);
+        
         
         console.log("Pirâmide:\nVERTICES = ", this.nVertices,
             "\nSHADER = ", gShader.vertices.length);
@@ -148,14 +157,15 @@ class Cilindro extends Poliedro {
         let topo = [];
         let texCoordsBase = [];
         let texCoordsTopo = [];
+
         const ang = 2 * Math.PI / nLados;
         for (let i = 0; i < nLados; i++) {
             let x = Math.cos(ang * i);
             let y = Math.sin(ang * i);
             base.push(vec3(x, y, -0.5));
             topo.push(vec3(x, y, 0.5));
-            texCoordsBase.push(vec2((x + 1) / 2, (y + 1) / 2));
-            texCoordsTopo.push(vec2((x + 1) / 2, (y + 1) / 2));
+            texCoordsBase.push(vec2((x + 1) / 2, (y + 1) / 2)); // mapeando um ponto (x, y) no círculo unitário para um ponto no quadrado da textura
+            texCoordsTopo.push(vec2((x + 1) / 2, (y + 1) / 2)); // mapeando um ponto (x, y) no círculo unitário para um ponto no quadrado da textura
         }
         
         // cria face base do cilindro
@@ -164,8 +174,8 @@ class Cilindro extends Poliedro {
         for (let i = 0; i < nLados; i++) {
             let vBase = base.at(i);
             let uBase = base.at((i + 1) % nLados);
-            let texVBase = texCoordsBase[i];
-            let texUBase = texCoordsBase[(i + 1) % nLados];
+            let texVBase = texCoordsBase.at(i);
+            let texUBase = texCoordsBase.at((i + 1) % nLados);
             this.criaTriangulo(vBase, centroBase, uBase, texVBase, texCentroBase, texUBase);
         }
 
@@ -175,8 +185,8 @@ class Cilindro extends Poliedro {
         for (let i = 0; i < nLados; i++) {
             let vTopo= topo.at(i);
             let uTopo = topo.at((i + 1) % nLados);
-            let texVTopo = texCoordsTopo[i];
-            let texUTopo = texCoordsTopo[(i + 1) % nLados];
+            let texVTopo = texCoordsTopo.at(i);
+            let texUTopo = texCoordsTopo.at((i + 1) % nLados);
             this.criaTriangulo(uTopo, centroTopo, vTopo, texUTopo, texCentroTopo, texVTopo);
         }
 
@@ -187,10 +197,12 @@ class Cilindro extends Poliedro {
             let vTopo = topo.at(i);
             let uBase = base.at((i + 1) % nLados);
             let uTopo = topo.at((i + 1) % nLados);
-            let texVBase = texCoordsBase[i];
-            let texVTopo = texCoordsTopo[i];
-            let texUBase = texCoordsBase[(i + 1) % nLados];
-            let texUTopo = texCoordsTopo[(i + 1) % nLados];
+            
+            // calcula as coordenadas de textura para as faces laterais
+            let texVBase = vec2(i, 0);
+            let texVTopo = vec2(i, 1);
+            let texUBase = vec2((i + 1) % nLados, 0);
+            let texUTopo = vec2((i + 1) % nLados, 1);
 
             this.criaTriangulo(uBase, vTopo, vBase, texUBase, texVTopo, texVBase); // 1° triângulo do corpo
             this.criaTriangulo(uTopo, vTopo, uBase, texUTopo, texVTopo, texUBase); // 2° triângulo do corpo
@@ -216,32 +228,29 @@ class Cubo extends Poliedro {
         ];
 
         let texCoordsCubo = [
-            vec2(0, 0), vec2(0, 1), vec2(1, 1), vec2(1, 0)
+            vec2(0.0, 0.0),   // canto inferior esquerdo
+            vec2(1.0, 0.0),   // canto inferior direito
+            vec2(1.0, 1.0),   // canto superior direito
+            vec2(0.0, 1.0)    // canto superior esquerdo
         ];
 
-        // Frente
-        this.criaTriangulo(verticesCubo[1], verticesCubo[0], verticesCubo[3], texCoordsCubo[1], texCoordsCubo[0], texCoordsCubo[3]);
-        this.criaTriangulo(verticesCubo[1], verticesCubo[3], verticesCubo[2], texCoordsCubo[1], texCoordsCubo[3], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[1], verticesCubo[0], verticesCubo[3], texCoordsCubo[0], texCoordsCubo[1], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[1], verticesCubo[3], verticesCubo[2], texCoordsCubo[0], texCoordsCubo[2], texCoordsCubo[3]);
 
-        // Direita
-        this.criaTriangulo(verticesCubo[2], verticesCubo[3], verticesCubo[7], texCoordsCubo[1], texCoordsCubo[0], texCoordsCubo[3]);
-        this.criaTriangulo(verticesCubo[2], verticesCubo[7], verticesCubo[6], texCoordsCubo[1], texCoordsCubo[3], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[2], verticesCubo[3], verticesCubo[7], texCoordsCubo[0], texCoordsCubo[1], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[2], verticesCubo[7], verticesCubo[6], texCoordsCubo[0], texCoordsCubo[2], texCoordsCubo[3]);
 
-        // Trás
-        this.criaTriangulo(verticesCubo[3], verticesCubo[0], verticesCubo[4], texCoordsCubo[1], texCoordsCubo[0], texCoordsCubo[3]);
-        this.criaTriangulo(verticesCubo[3], verticesCubo[4], verticesCubo[7], texCoordsCubo[1], texCoordsCubo[3], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[3], verticesCubo[0], verticesCubo[4], texCoordsCubo[0], texCoordsCubo[1], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[3], verticesCubo[4], verticesCubo[7], texCoordsCubo[0], texCoordsCubo[2], texCoordsCubo[3]);
 
-        // Esquerda
-        this.criaTriangulo(verticesCubo[6], verticesCubo[5], verticesCubo[1], texCoordsCubo[1], texCoordsCubo[0], texCoordsCubo[3]);
-        this.criaTriangulo(verticesCubo[6], verticesCubo[1], verticesCubo[2], texCoordsCubo[1], texCoordsCubo[3], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[6], verticesCubo[5], verticesCubo[1], texCoordsCubo[0], texCoordsCubo[1], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[6], verticesCubo[1], verticesCubo[2], texCoordsCubo[0], texCoordsCubo[2], texCoordsCubo[3]);
 
-        // Base
-        this.criaTriangulo(verticesCubo[4], verticesCubo[5], verticesCubo[6], texCoordsCubo[1], texCoordsCubo[0], texCoordsCubo[3]);
-        this.criaTriangulo(verticesCubo[4], verticesCubo[6], verticesCubo[7], texCoordsCubo[1], texCoordsCubo[3], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[4], verticesCubo[5], verticesCubo[6], texCoordsCubo[0], texCoordsCubo[1], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[4], verticesCubo[6], verticesCubo[7], texCoordsCubo[0], texCoordsCubo[2], texCoordsCubo[3]);
 
-        // Topo
-        this.criaTriangulo(verticesCubo[5], verticesCubo[4], verticesCubo[0], texCoordsCubo[1], texCoordsCubo[0], texCoordsCubo[3]);
-        this.criaTriangulo(verticesCubo[5], verticesCubo[0], verticesCubo[1], texCoordsCubo[1], texCoordsCubo[3], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[5], verticesCubo[4], verticesCubo[0], texCoordsCubo[0], texCoordsCubo[1], texCoordsCubo[2]);
+        this.criaTriangulo(verticesCubo[5], verticesCubo[0], verticesCubo[1], texCoordsCubo[0], texCoordsCubo[2], texCoordsCubo[3]);
 
         console.log("Cubo:\nVERTICES = ", this.nVertices,
             "\nSHADER = ", gShader.vertices.length);
