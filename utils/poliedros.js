@@ -1,8 +1,7 @@
 class Poliedro {
-    constructor(temTextura) {
+    constructor() {
         this.inicio = gShader.vertices.length;
         this.nVertices = 0;
-        this.temTextura = temTextura;
     }
 
     calculaNormal(a, b, c) {
@@ -28,8 +27,8 @@ class Poliedro {
 }
 
 class Esfera extends Poliedro {
-    constructor(subdivisoes, temTextura = 0) {
-        super(temTextura);
+    constructor(subdivisoes) {
+        super();
         this.subdivisoes = subdivisoes;
         this.crieEsfera();
 
@@ -108,8 +107,8 @@ class Esfera extends Poliedro {
 }
 
 class Piramide extends Poliedro {
-    constructor(temTextura = 0) {
-        super(temTextura);
+    constructor() {
+        super();
 
         let verticesPiramide = [
             vec3(0.0,  1.0,  0.0),    // 0
@@ -149,8 +148,8 @@ class Piramide extends Poliedro {
 }
 
 class Cilindro extends Poliedro {
-    constructor(nLados, temTextura = 0) {
-        super(temTextura);
+    constructor(nLados) {
+        super();
 
         // cria vértices da base e topo do cilindro
         let base = [];
@@ -214,8 +213,8 @@ class Cilindro extends Poliedro {
 }
 
 class Cubo extends Poliedro {
-    constructor(temTextura = 0) {
-        super(temTextura);
+    constructor() {
+        super();
         let verticesCubo = [
             vec3(-0.5, -0.5, 0.5),
             vec3(-0.5, 0.5, 0.5),
