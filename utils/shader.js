@@ -103,7 +103,7 @@ class Shader {
     /**
      * Cria e configura shaders de WebGL 2.0.
      */
-    criaShaders(GL, altura, largura, url) {
+    criaShaders(GL, altura, largura) {
         // inicializa
         this.GL = GL;
         GL.viewport(0, 0, largura, altura);

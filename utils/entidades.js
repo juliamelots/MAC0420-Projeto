@@ -39,7 +39,7 @@ class Camera {
 }
 
 class Elemento {
-    constructor(poliedro = null, gl, urlTextura) {
+    constructor(poliedro = null, gl, pathTextura) {
         // atributos físicos
         this.escala = vec3(1, 1, 1);
         this.trans = vec3(0, 0, 0);
@@ -49,9 +49,9 @@ class Elemento {
 
         // atributos gráficos
         this.poliedro = poliedro;
-        this.temTextura = urlTextura != null;
+        this.temTextura = pathTextura != null;
         this.textura = gl.createTexture();
-        this.img = this.carregaImagem(urlTextura);
+        this.img = this.carregaImagem(pathTextura);
         this.cor = {
             ambiente: vec4(0, 0, 0, 1),
             difusa: vec4(0, 0, 0, 1),
@@ -106,9 +106,9 @@ class Elemento {
         return dados;
     }
 
-    carregaImagem(url) {
+    carregaImagem(path) {
         var img = new Image(); // cria um bitmap
-        img.src = url;
+        img.src = path;
         img.crossOrigin = "anonymous";
         return img;
     }
