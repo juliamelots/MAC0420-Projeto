@@ -97,3 +97,67 @@ class Abelha {
         this.atualizaRotacaoAsas();
     }
 }
+
+class Peixe {
+    constructor(gl, pathTexturaCorpo, pathTexturaCauda, posicaoInicial = vec3(0, 0, 0)) {
+        this.posicaoInicial = posicaoInicial;
+
+        // corpo
+        this.corpo = new Elemento(new Esfera(2, 1), gl, pathTexturaCorpo);
+        this.corpo.escala = vec3(1, 0.5, 1);
+        this.corpo.trans = posicaoInicial;
+        this.corpo.theta = vec3(0, 0, 0);
+        this.corpo.vTheta = vec3(10, 0, 0);
+        this.corpo.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
+        this.corpo.cor.difusa = vec4(1, 1, 1, 1);
+        this.corpo.cor.especular = 50.0;
+
+        this.cauda = new Elemento(new Piramide(1), gl, pathTexturaCauda);
+        this.cauda.escala = vec3(0.5, 0.4, 0.5);
+        this.cauda.trans = add(posicaoInicial, vec3(1, 0, 0));
+        this.cauda.theta = vec3(0, 0, 90);
+        this.cauda.vTheta = vec3(10, 0, 0);
+        this.cauda.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
+        this.cauda.cor.difusa = vec4(1, 1, 1, 1);
+        this.cauda.cor.especular = 50.0;
+
+        // agrupa todos os elementos
+        this.elementos = [this.corpo, this.cauda];
+
+        // inicializa os ângulos e velocidades de movimento
+        this.anguloMov = 0;
+        this.anguloCauda = 0;
+        this.velocidadeMovCorpo = 0.5; 
+        this.velocidadeMovCauda = 0.5;
+        this.raioMov = 1; 
+    }
+    // método para atualizar a posição de uma parte do peixe
+    atualizaPosicaoParte(parte, offset) {
+        parte.trans = add(this.corpo.trans, offset);
+    }
+
+    // método para atualizar a rotação da cauda
+    atualizaRotacaoCauda() {
+        let rotCauda = 20 * Math.sin(this.anguloCauda); // 20 é a amplitude de rotação da cauda
+        this.cauda.theta = vec3(90, 90, rotCauda);
+    }
+
+    atualizaMovimentoInfinito(deltaTempo) {
+        this.anguloMov += this.velocidadeMovCorpo * deltaTempo;
+
+        // calcula a nova posição usando funções trigonométricas
+        // faz o peixe se mover em uma forma de infinito/"figure-8" 
+        let x = this.raioMov * Math.cos(this.anguloMov);
+        let y = this.raioMov * Math.sin(2*this.anguloMov) / 2;
+
+        // atualiza a posição do corpo
+        this.corpo.trans = add(this.posicaoInicial, vec3(x, y, 0));
+
+        // atualiza a posição das partes
+        this.atualizaPosicaoParte(this.cauda, vec3(-1, 0, 0));
+
+        // atualiza a rotação da cauda
+        this.anguloCauda += this.velocidadeMovCauda * deltaTempo * 10;
+        this.atualizaRotacaoCauda();
+    }
+}
