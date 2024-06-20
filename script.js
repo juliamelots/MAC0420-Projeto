@@ -96,15 +96,23 @@ function buildSimulator() {
     e.cor.especular = 50.0;
     gSimulator.obstacles.push(e);
 
-    let pathTexturaCorpo = "./assets/bee_body.jpg"
-    let pathTexturaAsas = "./assets/bug_wing2.jpg"
+    //let pathTexturaCorpo = "./assets/bee_body.jpg"
+    //let pathTexturaAsas = "./assets/bug_wing2.jpg"
+
+    let pathTexturaCorpo = "./assets/fish_texture.jpg";
+    let pathTexturaCauda = "./assets/fish_texture.jpg";
     
-    let abelha = new Abelha(gGL, pathTexturaCorpo, pathTexturaAsas, vec3(0, -2, 0));
+    //let abelha = new Abelha(gGL, pathTexturaCorpo, pathTexturaAsas, vec3(0, -2, 0));
     // let e_poly = new Esfera(2);
     // let e_poly = new Cubo();
+
+    let peixe = new Peixe(gGL, pathTexturaCorpo, pathTexturaCauda, vec3(0, -2, 0));
+
+    gSimulator.peixe = peixe;
+    gSimulator.obstacles.push(...peixe.elementos);
     
-    gSimulator.abelha = abelha;
-    gSimulator.obstacles.push(...abelha.elementos);
+   /*  gSimulator.abelha = abelha;
+    gSimulator.obstacles.push(...abelha.elementos); */
 }
 
 /**
@@ -135,8 +143,11 @@ function updateSimulator() {
     //     o.atualizaTheta(gSimulator.dt);
     // }
 
-    if (gSimulator.abelha) 
-        gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt); 
+/*     if (gSimulator.abelha) 
+        gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt);  */
+
+    if (gSimulator.peixe) 
+        gSimulator.peixe.atualizaMovimentoInfinito(gSimulator.dt);
 
     if (gInterface.activeStep) {
         gSimulator.dt = 0.0;
