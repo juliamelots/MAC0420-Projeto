@@ -96,23 +96,22 @@ function buildSimulator() {
     e.cor.especular = 50.0;
     gSimulator.obstacles.push(e);
 
-    let e_poly2 = new Cilindro(8);
+    let pathTexturaCorpo = "./assets/bee_body.jpg"
+    let pathTexturaAsas = "./assets/bug_wing2.jpg"
+    
+    let abelha = new Abelha(gGL, pathTexturaCorpo, pathTexturaAsas, vec3(0, -2, 0));
     // let e_poly = new Esfera(2);
     // let e_poly = new Cubo();
-    let e2 = new Elemento(e_poly2, gGL, urlTextura2);
-    e2.trans = vec3(0, -2, 1);
-    e2.vTheta = vec3(10, 0, 0);
-    e2.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
-    e2.cor.difusa = vec4(1, 0, 1, 1);
-    e2.cor.especular = 50.0;
-    gSimulator.obstacles.push(e2);
+    
+    gSimulator.abelha = abelha;
+    gSimulator.obstacles.push(...abelha.elementos);
 }
 
 /**
  * Cria e configura shaders de WebGL 2.0.
  */
 function createShaders() {
-    gShader.criaShaders(gGL, gInterface.canvas.height, gInterface.canvas.width, urlTextura);
+    gShader.criaShaders(gGL, gInterface.canvas.height, gInterface.canvas.width);
 }
 
 /**
@@ -130,12 +129,15 @@ function updateSimulator() {
     gSimulator.ship.atualizaTrans(gSimulator.dt);
     gSimulator.ship.atualizaTheta(gInterface.theta);
     
-    for (let i = 0; i < gSimulator.obstacles.length; i++) {
-        let o = gSimulator.obstacles.at(i);
-        o.atualizaTrans(gSimulator.dt);
-        o.atualizaTheta(gSimulator.dt);
-    }
-    
+    // for (let i = 0; i < gSimulator.obstacles.length; i++) {
+    //     let o = gSimulator.obstacles.at(i);
+    //     o.atualizaTrans(gSimulator.dt);
+    //     o.atualizaTheta(gSimulator.dt);
+    // }
+
+    if (gSimulator.abelha) 
+        gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt); 
+
     if (gInterface.activeStep) {
         gSimulator.dt = 0.0;
         gInterface.activeStep = false;
