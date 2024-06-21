@@ -104,10 +104,10 @@ class Peixe {
 
         // corpo
         this.corpo = new Elemento(new Esfera(2, 1), gl, pathTexturaCorpo);
-        this.corpo.escala = vec3(1, 0.5, 1);
+        this.corpo.escala = vec3(1, 1, 0.5);
         this.corpo.trans = posicaoInicial;
         this.corpo.theta = vec3(0, 0, 0);
-        this.corpo.vTheta = vec3(10, 0, 0);
+        this.corpo.vTheta = vec3(0, 0, 0);
         this.corpo.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.corpo.cor.difusa = vec4(1, 1, 1, 1);
         this.corpo.cor.especular = 50.0;
@@ -127,6 +127,7 @@ class Peixe {
         // inicializa os ângulos e velocidades de movimento
         this.anguloMov = 0;
         this.anguloCauda = 0;
+        this.anguloCorpo = 0;
         this.velocidadeMovCorpo = 0.5; 
         this.velocidadeMovCauda = 0.5;
         this.raioMov = 1; 
@@ -140,6 +141,32 @@ class Peixe {
     atualizaRotacaoCauda() {
         let rotCauda = 20 * Math.sin(this.anguloCauda); // 20 é a amplitude de rotação da cauda
         this.cauda.theta = vec3(90, 90, rotCauda);
+    }
+
+    atualizaRotacaoCorpo() {
+        let rotCorpo = 5 * Math.sin(this.anguloCorpo); // 5 é a amplitude de rotação da Corpo
+        this.corpo.theta = vec3(90, -90, -rotCorpo);
+    }
+
+    atualizaMovimentoCircular(deltaTempo) {
+        this.anguloMov += this.velocidadeMovCorpo * deltaTempo;
+
+        // calcula a nova posição usando funções trigonométricas
+        let x = this.raioMov * Math.cos(this.anguloMov);
+        let y = this.raioMov * Math.sin(this.anguloMov);
+
+        // atualiza a posição do corpo
+        this.corpo.trans = add(this.posicaoInicial, vec3(x, y, 0));
+
+        // atualiza a posição das partes
+        this.atualizaPosicaoParte(this.cauda, vec3(-1, 0, 0));
+
+        // atualiza a rotação da cauda
+        this.anguloCauda += this.velocidadeMovCauda * deltaTempo * 10;
+        this.atualizaRotacaoCauda();
+
+        this.anguloCorpo += this.velocidadeMovCorpo * deltaTempo * 10;
+        this.atualizaRotacaoCorpo();
     }
 
     atualizaMovimentoInfinito(deltaTempo) {
@@ -159,5 +186,8 @@ class Peixe {
         // atualiza a rotação da cauda
         this.anguloCauda += this.velocidadeMovCauda * deltaTempo * 10;
         this.atualizaRotacaoCauda();
+
+        this.anguloCorpo += this.velocidadeMovCorpo * deltaTempo * 10;
+        this.atualizaRotacaoCorpo();
     }
 }

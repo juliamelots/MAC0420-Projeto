@@ -90,7 +90,7 @@ function buildSimulator() {
     // let e_poly = new Cubo();
     let e = new Elemento(e_poly, gGL, urlTextura);
     e.trans = vec3(0, 0, 1);
-    e.vTheta = vec3(10, 0, 0);
+    e.vTheta = vec3(50, 0, 0);
     e.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
     e.cor.difusa = vec4(1, 0, 1, 1);
     e.cor.especular = 50.0;
@@ -99,14 +99,14 @@ function buildSimulator() {
     //let pathTexturaCorpo = "./assets/bee_body.jpg"
     //let pathTexturaAsas = "./assets/bug_wing2.jpg"
 
-    let pathTexturaCorpo = "./assets/fish_texture.jpg";
-    let pathTexturaCauda = "./assets/fish_texture.jpg";
+    let pathTexturaPeixeCorpo = "./assets/fish_texture.jpg";
+    let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
     
     //let abelha = new Abelha(gGL, pathTexturaCorpo, pathTexturaAsas, vec3(0, -2, 0));
     // let e_poly = new Esfera(2);
     // let e_poly = new Cubo();
 
-    let peixe = new Peixe(gGL, pathTexturaCorpo, pathTexturaCauda, vec3(0, -2, 0));
+    let peixe = new Peixe(gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda, vec3(0, -2, 0));
 
     gSimulator.peixe = peixe;
     gSimulator.obstacles.push(...peixe.elementos);
@@ -137,14 +137,14 @@ function updateSimulator() {
     gSimulator.ship.atualizaTrans(gSimulator.dt);
     gSimulator.ship.atualizaTheta(gInterface.theta);
     
-    // for (let i = 0; i < gSimulator.obstacles.length; i++) {
-    //     let o = gSimulator.obstacles.at(i);
-    //     o.atualizaTrans(gSimulator.dt);
-    //     o.atualizaTheta(gSimulator.dt);
-    // }
+    for (let i = 0; i < gSimulator.obstacles.length; i++) {
+        let o = gSimulator.obstacles.at(i);
+        o.atualizaTrans(gSimulator.dt);
+        o.atualizaTheta(gSimulator.dt);
+    }
 
-/*     if (gSimulator.abelha) 
-        gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt);  */
+    if (gSimulator.abelha) 
+        gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt);
 
     if (gSimulator.peixe) 
         gSimulator.peixe.atualizaMovimentoInfinito(gSimulator.dt);
