@@ -96,23 +96,21 @@ function buildSimulator() {
     e.cor.especular = 50.0;
     gSimulator.obstacles.push(e);
 
-    //let pathTexturaCorpo = "./assets/bee_body.jpg"
-    //let pathTexturaAsas = "./assets/bug_wing2.jpg"
+    let pathTexturaCorpoAbelha = "./assets/bee_body.jpg";
+    let pathTexturaAsas = "./assets/bug_wing2.jpg";
 
     let pathTexturaPeixeCorpo = "./assets/fish_texture.jpg";
     let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
     
-    //let abelha = new Abelha(gGL, pathTexturaCorpo, pathTexturaAsas, vec3(0, -2, 0));
-    // let e_poly = new Esfera(2);
-    // let e_poly = new Cubo();
+    let abelha = new Abelha(gGL, pathTexturaCorpoAbelha, pathTexturaAsas, vec3(0, -4, 0));
 
     let peixe = new Peixe(gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda, vec3(0, -2, 0));
 
     gSimulator.peixe = peixe;
     gSimulator.obstacles.push(...peixe.elementos);
-    
-   /*  gSimulator.abelha = abelha;
-    gSimulator.obstacles.push(...abelha.elementos); */
+
+    gSimulator.abelha = abelha;
+    gSimulator.obstacles.push(...abelha.elementos);
 }
 
 /**

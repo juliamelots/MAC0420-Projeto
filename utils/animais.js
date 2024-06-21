@@ -7,7 +7,7 @@ class Abelha {
         this.corpo = new Elemento(new Esfera(2, 1), gl, pathTexturaCorpo);
         this.corpo.escala = vec3(0.5, 0.5, 1); // escalar para formar o corpo da abelha
         this.corpo.trans = posicaoInicial; // posicionar o corpo na posição inicial
-        this.corpo.vTheta = vec3(10, 0, 0);
+        this.corpo.vTheta = vec3(0, 0, 0);
         this.corpo.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.corpo.cor.difusa = vec4(1, 1, 1, 1);
         this.corpo.cor.especular = 50.0;
@@ -17,7 +17,7 @@ class Abelha {
         this.asaEsquerda.escala = vec3(0.2, 0.4, 0.1); // escalar para formar a asa
         this.asaEsquerda.trans = add(posicaoInicial, vec3(-0.6, 0, 0)); // posicionar a asa à esquerda do corpo
         this.asaEsquerda.theta = vec3(0, 0, -90); // rotacionar a asa
-        this.asaEsquerda.vTheta = vec3(10, 0, 0);
+        this.asaEsquerda.vTheta = vec3(0, 0, 0);
         this.asaEsquerda.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.asaEsquerda.cor.difusa = vec4(1, 1, 1, 1);
         this.asaEsquerda.cor.especular = 50.0;
@@ -27,7 +27,7 @@ class Abelha {
         this.asaDireita.escala = vec3(0.25, 0.4, 0.1); // escalar para formar a asa
         this.asaDireita.trans = add(posicaoInicial, vec3(0.6, 0, 0)); // posicionar a asa à direita do corpo
         this.asaDireita.theta = vec3(0, 0, 90); // rotacionar a asa
-        this.asaDireita.vTheta = vec3(10, 0, 0);
+        this.asaDireita.vTheta = vec3(0, 0, 0);
         this.asaDireita.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.asaDireita.cor.difusa = vec4(1, 1, 1, 1);
         this.asaDireita.cor.especular = 50.0;
@@ -37,7 +37,7 @@ class Abelha {
         this.antenaEsquerda.escala = vec3(0.05, 0.05, 0.3); // escalar para formar a antena
         this.antenaEsquerda.trans = add(posicaoInicial, vec3(-0.4, 0.2, 0.8)); // posicionar a antena à esquerda do corpo
         this.antenaEsquerda.theta = vec3(90, 0, 40); // rotacionar a antena
-        this.antenaEsquerda.vTheta = vec3(10, 0, 0);
+        this.antenaEsquerda.vTheta = vec3(0, 0, 0);
         this.antenaEsquerda.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.antenaEsquerda.cor.difusa = vec4(0, 0, 0, 1);
         this.antenaEsquerda.cor.especular = 50.0;
@@ -47,7 +47,7 @@ class Abelha {
         this.antenaDireita.escala = vec3(0.05, 0.05, 0.3); // escalar para formar a antena
         this.antenaDireita.trans = add(posicaoInicial, vec3(0.4, 0.2, 0.8)); // posicionar a antena à direita do corpo
         this.antenaDireita.theta = vec3(-90, 0, -40); // rotacionar a antena
-        this.antenaDireita.vTheta = vec3(10, 0, 0);
+        this.antenaDireita.vTheta = vec3(0, 0, 0);
         this.antenaDireita.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.antenaDireita.cor.difusa = vec4(0, 0, 0, 1);
         this.antenaDireita.cor.especular = 50.0;
@@ -104,7 +104,7 @@ class Peixe {
 
         // corpo
         this.corpo = new Elemento(new Esfera(2, 1), gl, pathTexturaCorpo);
-        this.corpo.escala = vec3(1, 1, 0.5);
+        this.corpo.escala = vec3(1, 0.5, 1);
         this.corpo.trans = posicaoInicial;
         this.corpo.theta = vec3(0, 0, 0);
         this.corpo.vTheta = vec3(0, 0, 0);
@@ -116,7 +116,7 @@ class Peixe {
         this.cauda.escala = vec3(0.5, 0.4, 0.5);
         this.cauda.trans = add(posicaoInicial, vec3(1, 0, 0));
         this.cauda.theta = vec3(0, 0, 90);
-        this.cauda.vTheta = vec3(10, 0, 0);
+        this.cauda.vTheta = vec3(0, 0, 0);
         this.cauda.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.cauda.cor.difusa = vec4(1, 1, 1, 1);
         this.cauda.cor.especular = 50.0;
@@ -134,13 +134,19 @@ class Peixe {
     }
     // método para atualizar a posição de uma parte do peixe
     atualizaPosicaoParte(parte, offset) {
-        parte.trans = add(this.corpo.trans, offset);
+        let anguloRad = this.corpo.theta[2] * Math.PI / 180; // angulo de rotaçao do peixe em torno do eixo z
+        let offsetRotacionado = vec3(
+            offset[0] * Math.cos(anguloRad) - offset[1] * Math.sin(anguloRad),
+            offset[0] * Math.sin(anguloRad) + offset[1] * Math.cos(anguloRad),
+            offset[2]
+        ); // rotacionando o offset em torno do eixo z (usando como ref a matriz de rotaçao no eixo z)
+        parte.trans = add(this.corpo.trans, offsetRotacionado);
     }
 
     // método para atualizar a rotação da cauda
     atualizaRotacaoCauda() {
         let rotCauda = 20 * Math.sin(this.anguloCauda); // 20 é a amplitude de rotação da cauda
-        this.cauda.theta = vec3(90, 90, rotCauda);
+        this.cauda.theta = vec3(0, 0, this.corpo.theta[2] + rotCauda - 90);
     }
 
     atualizaRotacaoCorpo() {
@@ -180,14 +186,21 @@ class Peixe {
         // atualiza a posição do corpo
         this.corpo.trans = add(this.posicaoInicial, vec3(x, y, 0));
 
+        // calcula a direção do movimento
+        let dx = -this.raioMov * Math.sin(this.anguloMov); // derivada de x
+        let dy = this.raioMov * Math.cos(2*this.anguloMov); // derivada de y
+
+        // calcula o ângulo de rotação
+        let anguloRotacao = Math.atan2(dy, dx) * 180 / Math.PI; // calcula angulo entre (x, y) e eixo x
+
+        // aplica a rotação ao corpo
+        this.corpo.theta = vec3(0, 0, anguloRotacao);
+
         // atualiza a posição das partes
         this.atualizaPosicaoParte(this.cauda, vec3(-1, 0, 0));
 
         // atualiza a rotação da cauda
         this.anguloCauda += this.velocidadeMovCauda * deltaTempo * 10;
         this.atualizaRotacaoCauda();
-
-        this.anguloCorpo += this.velocidadeMovCorpo * deltaTempo * 10;
-        this.atualizaRotacaoCorpo();
     }
 }
