@@ -92,39 +92,38 @@ function buildSimulator() {
 
     // chão
     let pathTexturaChao = "./assets/grass.jpg";
-    let chao = new Elemento(new Cubo(), gGL, pathTexturaChao);
-    chao.escala = vec3(25, 25, 5);
-    chao.trans = vec3(0, 0, -2.5);
-    chao.cor.ambiente = vec4(1, 1, 1, 1);
-    chao.cor.difusa = vec4(1, 1, 1, 1);
-    chao.cor.especular = 150.0;
-    gSimulator.obstacles.push(chao);
+    let chao = new Chao(gGL, pathTexturaChao, vec3(0, 0, -2.5));
+    gSimulator.obstacles.push(chao.elemento);
 
     // lago
-    let lago = new Elemento(new Cubo(), gGL, null);
-    lago.escala = vec3(10, 10, 5);
-    lago.trans = vec3(-6, -7.5, -2.45);
-    lago.cor.ambiente = vec4(0, 0, 1, 1);
-    lago.cor.difusa = vec4(0, 0, 1, 1);
-    lago.cor.especular = 50.0;
-    gSimulator.obstacles.push(lago);
+    let lago = new Lago(gGL, null, vec3(-6, -7.5, -2.45));
+    gSimulator.obstacles.push(lago.elemento);
 
-    // árvore
-    let tronco = new Elemento(new Cilindro(8), gGL, null);
-    tronco.escala = vec3(0.5, 0.5, 3);
-    tronco.trans = vec3(-7.5, 0, 1.5);
-    tronco.cor.ambiente = vec4(0.42, 0.28, 0.16, 1);
-    tronco.cor.difusa = vec4(0.42, 0.28, 0.16, 1);
-    tronco.cor.especular = 50.0;
-    gSimulator.obstacles.push(tronco);
-    let pathTexturaFolhas = "./assets/tree_leaves.jpg";
-    let folhas = new Elemento(new Esfera(2), gGL, pathTexturaFolhas);
-    folhas.escala = vec3(1.5, 1.5, 1);
-    folhas.trans = vec3(-7.5, 0, 3.5);
-    folhas.cor.ambiente = vec4(0.3, 0.43, 0, 1);
-    folhas.cor.difusa = vec4(0.3, 0.43, 0, 1);
-    folhas.cor.especular = 50.0;
-    gSimulator.obstacles.push(folhas);
+    // árvores
+    let arvore1 = new Arvore(gGL, null, null, vec3(-7.5, 0, 1.5));
+    gSimulator.obstacles.push(...arvore1.elementos);
+    let arvore2 = new Arvore(gGL, null, null, vec3(1.5, 9.0, 1.5));
+    gSimulator.obstacles.push(...arvore2.elementos);
+
+    // pedras
+    let pathTexturaPedra = "./assets/rock.jpg";
+    let pedra1 = new Pedra(gGL, pathTexturaPedra, vec3(0, -10.5, 0), vec3(0.7, 0.7, 0.7));
+    gSimulator.obstacles.push(pedra1.elemento);
+    let pedra2 = new Pedra(gGL, pathTexturaPedra, vec3(0, -11.5, 0), vec3(0.5, 0.4, 0.7));
+    gSimulator.obstacles.push(pedra2.elemento);
+    let pedra3 = new Pedra(gGL, pathTexturaPedra, vec3(0.5, -11.0, 0), vec3(0.6, 0.4, 0.7));
+    gSimulator.obstacles.push(pedra3.elemento);
+    let pedra4 = new Pedra(gGL, pathTexturaPedra, vec3(0, -3.5, 0), vec3(0.7, 0.7, 0.7));
+    gSimulator.obstacles.push(pedra4.elemento);
+    let pedra5 = new Pedra(gGL, pathTexturaPedra, vec3(0, -4.5, 0), vec3(0.5, 0.4, 0.7));
+    gSimulator.obstacles.push(pedra5.elemento);
+    let pedra6 = new Pedra(gGL, pathTexturaPedra, vec3(0.5, -4.0, 0), vec3(0.6, 0.4, 0.7));
+    gSimulator.obstacles.push(pedra6.elemento);
+
+    // horta
+    let pathTexturaTerra = "./assets/dirt.jpg";
+    let horta = new Horta(gGL, pathTexturaTerra, null, vec3(8, -5.5, -2.45));
+    gSimulator.obstacles.push(...horta.elementos);
 
     // animais
     let pathTexturaCorpoAbelha = "./assets/bee_body.jpg";
