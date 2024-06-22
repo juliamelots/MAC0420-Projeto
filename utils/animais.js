@@ -130,7 +130,7 @@ class Peixe {
         this.anguloCorpo = 0;
         this.velocidadeMovCorpo = 0.5; 
         this.velocidadeMovCauda = 0.5;
-        this.raioMov = 1; 
+        this.raioMov = 1;
     }
     // método para atualizar a posição de uma parte do peixe
     atualizaPosicaoParte(parte, offset) {
@@ -202,5 +202,61 @@ class Peixe {
         // atualiza a rotação da cauda
         this.anguloCauda += this.velocidadeMovCauda * deltaTempo * 10;
         this.atualizaRotacaoCauda();
+    }
+}
+
+class Caracol {
+    constructor(gl, pathTexturaCorpo, pathTexturaCauda, posicaoInicial = vec3(0, 0, 0)) {
+        this.posicaoInicial = posicaoInicial;
+
+        this.corpo = new Elemento(new Cilindro(8), gl, pathTexturaCorpo);
+        this.corpo.escala = vec3(0.35, 0.35, 2);
+        this.corpo.trans = posicaoInicial;
+        this.corpo.theta = vec3(0, 90, 0);
+
+        this.cabeca = new Elemento(new Cilindro(8), gl, pathTexturaCauda);
+        this.cabeca.escala = vec3(0.35, 0.35, 1);
+        this.cabeca.trans = add(posicaoInicial, vec3(1, 0, 0));
+
+        this.concha = new Elemento(new Esfera(2), gl, pathTexturaCauda);
+        this.concha.escala = vec3(0.75, 0.35, 0.75);
+        this.concha.trans = add(posicaoInicial, vec3(-0.15, 0, 1));
+
+        // agrupa todos os elementos
+        this.elementos = [this.corpo, this.cabeca, this.concha];
+
+        // inicializa
+        this.semiEixoX = 3;
+        this.semiEixoY = 5;
+        this.anguloCabeca = 0;
+        this.velocidadeMovCabeca = 0.5;
+    }
+
+    // método para atualizar a posição de uma parte da abelha
+    atualizaPosicaoParte(parte, offset) {
+        parte.trans = add(this.corpo.trans, offset);
+    }
+
+    // método para atualizar a rotação da cauda
+    atualizaRotacaoCabeca(theta) {
+        let rotCauda = 20 * Math.sin(this.anguloCauda); // 20 é a amplitude de rotação da cauda
+        this.cauda.theta[Z] += rotCauda - 90;
+    }
+
+    atualizaMovimentoInativo(deltaTempo) {
+        // calcula a nova posição usando funções trigonométricas
+        let x = this.semiEixoX * Math.cos(deltaTempo);
+        let y = this.semiEixoY * Math.sin(deltaTempo);
+
+        // atualiza a posição do corpo
+        this.corpo.trans = add(this.posicaoInicial, vec3(x, y, 0));
+
+        // atualiza a posição das partes
+        this.atualizaPosicaoParte(this.pescoco, vec3(1, 0, 0));
+        this.atualizaPosicaoParte(this.concha, vec3(-0.15, 0, 1));
+
+        // atualiza a rotação da cabeça
+        this.anguloCabeca += this.velocidadeMovCabeca * deltaTempo * 10;
+        this.atualizaRotacaoCabeca();
     }
 }

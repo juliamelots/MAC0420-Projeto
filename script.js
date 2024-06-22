@@ -103,14 +103,16 @@ function buildSimulator() {
     let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
     
     let abelha = new Abelha(gGL, pathTexturaCorpoAbelha, pathTexturaAsas, vec3(0, -4, 0));
+    gSimulator.abelha = abelha;
+    gSimulator.obstacles.push(...abelha.elementos);
 
     let peixe = new Peixe(gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda, vec3(0, -2, 0));
-
     gSimulator.peixe = peixe;
     gSimulator.obstacles.push(...peixe.elementos);
 
-    gSimulator.abelha = abelha;
-    gSimulator.obstacles.push(...abelha.elementos);
+    let caracol = new Caracol(gGL, null, null, vec3(0, -3, 0));
+    gSimulator.caracol = caracol;
+    gSimulator.obstacles.push(...caracol.elementos);
 }
 
 /**
