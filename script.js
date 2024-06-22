@@ -59,6 +59,8 @@ function buildInterface() {
     gInterface.step = document.getElementById("bStep");
     gInterface.activeStep = false;
     gInterface.canvas = document.getElementById("glCanvas");
+    gInterface.slider = document.getElementById("sun");
+    gInterface.slider.value = 10.0;
 
     // canvas
     gGL = gInterface.canvas.getContext("webgl2");
@@ -68,6 +70,7 @@ function buildInterface() {
     // registro das funções de callback
     gInterface.run.onclick = callbackRun;
     gInterface.step.onclick = callbackStep;
+    gInterface.slider.onchange = callbackChangeDay;
     onkeypress = callbackKBoard;
 }
 
@@ -286,6 +289,31 @@ function callbackKBoard(e) {
         console.log("Tecla de controle inválida.");
 }
 
+
+function callbackChangeDay(e) {
+    let delta = gInterface.slider.max - gInterface.slider.min;
+    let alfa = (gInterface.slider.value - gInterface.slider.min) / delta;
+
+    // cores em diferentes momentos do dia
+    const corMaxIluminacao = [1.0, 1.0, 0.8]; 
+    const corMinIluminacao = [0.5, 0.0, 0.5]; 
+
+    // interpolação entre o máximo de iluminação e o mínimo de iluminação
+    let corInterpolada = interpolaCor(corMaxIluminacao, corMinIluminacao, alfa);
+
+    let nova_difusao = vec4(corInterpolada[0], corInterpolada[1], corInterpolada[2], 1);
+    gSimulator.sol.cor.difusa = nova_difusao;
+
+    // atualiza a cor de fundo do canvas
+    const corBackgroundDia = [0.52, 0.80, 0.98]; 
+    const corBackgroundNoite = [0.3, 0.0, 0.3]; 
+    let corBackground = interpolaCor(corBackgroundDia, corBackgroundNoite, alfa);
+
+    gGL.clearColor(corBackground[0], corBackground[1], corBackground[2], 1.0);
+    gGL.clear(gSimulator.GL.COLOR_BUFFER_BIT | gSimulator.GL.DEPTH_BUFFER_BIT);
+}
+
+
 /* ==================================================================
   Funções auxiliares
 */
@@ -312,6 +340,17 @@ function rotateXYZ(x, y, z) {
     let rY = rotateY(y);
     let rZ = rotateZ(z);
     return mult(rZ, mult(rY, rX));
+}
+
+/**
+ * Faz interpolação entre duas cores a partir de um fator de interpolação
+ */
+function interpolaCor(cor1, cor2, fator) {
+    let corResultado = cor1.slice(); // Cria uma cópia de color1
+    for (let i = 0; i < 3; i++) {
+        corResultado[i] = cor1[i] + fator * (cor2[i] - cor1[i]);
+    }
+    return corResultado;
 }
 
 /**
