@@ -1,8 +1,9 @@
 /*
-    script.js de MAC0420/MAC5744 - Simulador de Voo
+    script.js de MAC0420/MAC5744 - Jardim
 
-    Nome: Júlia Melo Teixeira dos Santos
-    NUSP: 12542306
+    Clara Yuki Sano - 11809920
+    Júlia Melo Teixeira dos Santos - 12542306
+    Luísa Menezes da Costa - 12676491
  */
 
 window.onload = main;
@@ -24,7 +25,7 @@ const COLOR = [vec4(0.0, 0.0, 0.0, 1.0),    // black    0
     vec4(1.0, 1.0, 0.0, 1.0)];              // yellow   7
 
 const urlTextura = "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Flower_poster_2.jpg/1200px-Flower_poster_2.jpg";
-const urlTextura2 = "https://veja.abril.com.br/wp-content/uploads/2016/12/xadrez-tabuleiro.gif";
+const urlTextura2 = "https://www.google.com/url?sa=i&url=https%3A%2F%2Fdepositphotos.com%2Fbr%2Fphotos%2Fgrama-com-flores.html&psig=AOvVaw1SJC2ELzL0kaj-cJ4L7c7k&ust=1719152541219000&source=images&cd=vfe&opi=89978449&ved=0CBQQjRxqFwoTCMiK7LW074YDFQAAAAAdAAAAABA9";
 
 var vTextura = [
     vec2(0.0, 0.0),
@@ -74,10 +75,11 @@ function buildInterface() {
  * Registra os elementos do simulador de voo em seu objeto.
  */
 function buildSimulator() {
-    gSimulator.ship = new Camera(vec3(0, -2, 5), vec3(0, 0, 0));
+    gSimulator.ship = new Camera(vec3(15, -15, 10), vec3(60, 0, 45));
+    gInterface.theta = vec3(60, 0, 45);
 
     let sol = new Elemento(null, gGL, null);
-    sol.trans = vec3(0, 0, 10);
+    sol.trans = vec3(0, 0, 65);
     sol.cor.ambiente = vec4(0.2, 0.2, 0.2, 1);
     sol.cor.difusa = vec4(1, 1, 1, 1);
     sol.cor.especular = vec4(1, 1, 1, 1);
@@ -85,32 +87,56 @@ function buildSimulator() {
     
     gSimulator.obstacles = [];
 
-    let e_poly = new Cubo(1);
-    // let e_poly = new Esfera(2);
-    // let e_poly = new Cubo();
-    let e = new Elemento(e_poly, gGL, urlTextura);
-    e.trans = vec3(0, 0, 1);
-    e.vTheta = vec3(50, 0, 0);
-    e.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
-    e.cor.difusa = vec4(1, 0, 1, 1);
-    e.cor.especular = 50.0;
-    gSimulator.obstacles.push(e);
+    // chão
+    let pathTexturaChao = "./assets/grass.jpg";
+    let chao = new Elemento(new Cubo(), gGL, pathTexturaChao);
+    chao.escala = vec3(25, 25, 5);
+    chao.trans = vec3(0, 0, -2.5);
+    chao.cor.ambiente = vec4(1, 1, 1, 1);
+    chao.cor.difusa = vec4(1, 1, 1, 1);
+    chao.cor.especular = 150.0;
+    gSimulator.obstacles.push(chao);
 
+    // lago
+    let lago = new Elemento(new Cubo(), gGL, null);
+    lago.escala = vec3(10, 10, 5);
+    lago.trans = vec3(-6, -7.5, -2.45);
+    lago.cor.ambiente = vec4(0, 0, 1, 1);
+    lago.cor.difusa = vec4(0, 0, 1, 1);
+    lago.cor.especular = 50.0;
+    gSimulator.obstacles.push(lago);
+
+    // árvore
+    let tronco = new Elemento(new Cilindro(8), gGL, null);
+    tronco.escala = vec3(0.5, 0.5, 3);
+    tronco.trans = vec3(-7.5, 0, 1.5);
+    tronco.cor.ambiente = vec4(0.42, 0.28, 0.16, 1);
+    tronco.cor.difusa = vec4(0.42, 0.28, 0.16, 1);
+    tronco.cor.especular = 50.0;
+    gSimulator.obstacles.push(tronco);
+    let pathTexturaFolhas = "./assets/tree_leaves.jpg";
+    let folhas = new Elemento(new Esfera(2), gGL, pathTexturaFolhas);
+    folhas.escala = vec3(1.5, 1.5, 1);
+    folhas.trans = vec3(-7.5, 0, 3.5);
+    folhas.cor.ambiente = vec4(0.3, 0.43, 0, 1);
+    folhas.cor.difusa = vec4(0.3, 0.43, 0, 1);
+    folhas.cor.especular = 50.0;
+    gSimulator.obstacles.push(folhas);
+
+    // animais
     let pathTexturaCorpoAbelha = "./assets/bee_body.jpg";
     let pathTexturaAsas = "./assets/bug_wing2.jpg";
-
-    let pathTexturaPeixeCorpo = "./assets/fish_texture.jpg";
-    let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
-    
-    let abelha = new Abelha(gGL, pathTexturaCorpoAbelha, pathTexturaAsas, vec3(0, -4, 0));
+    let abelha = new Abelha(gGL, pathTexturaCorpoAbelha, pathTexturaAsas, vec3(7.5, 7.5, 5));
     gSimulator.abelha = abelha;
     gSimulator.obstacles.push(...abelha.elementos);
 
-    let peixe = new Peixe(gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda, vec3(0, -2, 0));
+    let pathTexturaPeixeCorpo = "./assets/fish_texture.jpg";
+    let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
+    let peixe = new Peixe(gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda, vec3(-6, -7.5, 0));
     gSimulator.peixe = peixe;
     gSimulator.obstacles.push(...peixe.elementos);
 
-    let caracol = new Caracol(gGL, null, null, vec3(0, -3, 0));
+    let caracol = new Caracol(gGL, null, null, vec3(-7.5, 7.5, 0.35));
     gSimulator.caracol = caracol;
     gSimulator.obstacles.push(...caracol.elementos);
 }
@@ -325,35 +351,3 @@ function showCoordinateSystem() {
     a.trans = vec3(0, 0, -1);
     gSimulator.obstacles.push(a);
 }
-
-/* ==================================================================
-  Códigos de shaders
-*/
-var glVertexShaderSrc = `#version 300 es
-in vec3 aVertex;
-uniform mat4 uView;
-uniform mat4 uPerspective;
-uniform mat4 uTranslate;
-uniform mat4 uScale;
-uniform mat4 uRotate;
-
-uniform vec4 aColor;
-out vec4 vColor;
-
-void main() {
-    mat4 model = uTranslate * uRotate * uScale;
-    gl_Position = uPerspective * uView * model * vec4(aVertex, 1);
-    vColor = aColor;
-}
-`;
-
-var glFragmentShaderSrc = `#version 300 es
-precision highp float;
-
-in vec4 vColor;
-out vec4 outColor;
-
-void main() {
-  outColor = vColor;
-}
-`;

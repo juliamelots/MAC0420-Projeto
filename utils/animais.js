@@ -7,6 +7,7 @@ class Abelha {
         this.corpo = new Elemento(new Esfera(2, 1), gl, pathTexturaCorpo);
         this.corpo.escala = vec3(0.5, 0.5, 1); // escalar para formar o corpo da abelha
         this.corpo.trans = posicaoInicial; // posicionar o corpo na posição inicial
+        this.corpo.theta = vec3(90, 0, 0);
         this.corpo.vTheta = vec3(0, 0, 0);
         this.corpo.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.corpo.cor.difusa = vec4(1, 1, 1, 1);
@@ -16,7 +17,7 @@ class Abelha {
         this.asaEsquerda = new Elemento(new Piramide(1), gl, pathTexturaAsas);
         this.asaEsquerda.escala = vec3(0.2, 0.4, 0.1); // escalar para formar a asa
         this.asaEsquerda.trans = add(posicaoInicial, vec3(-0.6, 0, 0)); // posicionar a asa à esquerda do corpo
-        this.asaEsquerda.theta = vec3(0, 0, -90); // rotacionar a asa
+        this.asaEsquerda.theta = vec3(90, 0, -90); // rotacionar a asa
         this.asaEsquerda.vTheta = vec3(0, 0, 0);
         this.asaEsquerda.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.asaEsquerda.cor.difusa = vec4(1, 1, 1, 1);
@@ -26,7 +27,7 @@ class Abelha {
         this.asaDireita = new Elemento(new Piramide(1), gl, pathTexturaAsas);
         this.asaDireita.escala = vec3(0.25, 0.4, 0.1); // escalar para formar a asa
         this.asaDireita.trans = add(posicaoInicial, vec3(0.6, 0, 0)); // posicionar a asa à direita do corpo
-        this.asaDireita.theta = vec3(0, 0, 90); // rotacionar a asa
+        this.asaDireita.theta = vec3(90, 0, 90); // rotacionar a asa
         this.asaDireita.vTheta = vec3(0, 0, 0);
         this.asaDireita.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
         this.asaDireita.cor.difusa = vec4(1, 1, 1, 1);
@@ -35,7 +36,7 @@ class Abelha {
         // cria antena esquerda
         this.antenaEsquerda = new Elemento(new Cilindro(8), gl, null);
         this.antenaEsquerda.escala = vec3(0.05, 0.05, 0.3); // escalar para formar a antena
-        this.antenaEsquerda.trans = add(posicaoInicial, vec3(-0.4, 0.2, 0.8)); // posicionar a antena à esquerda do corpo
+        this.antenaEsquerda.trans = add(posicaoInicial, vec3(-0.4, 0.2, 0.3)); // posicionar a antena à esquerda do corpo
         this.antenaEsquerda.theta = vec3(90, 0, 40); // rotacionar a antena
         this.antenaEsquerda.vTheta = vec3(0, 0, 0);
         this.antenaEsquerda.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
@@ -45,7 +46,7 @@ class Abelha {
         // cria antena direita
         this.antenaDireita = new Elemento(new Cilindro(8), gl, null);
         this.antenaDireita.escala = vec3(0.05, 0.05, 0.3); // escalar para formar a antena
-        this.antenaDireita.trans = add(posicaoInicial, vec3(0.4, 0.2, 0.8)); // posicionar a antena à direita do corpo
+        this.antenaDireita.trans = add(posicaoInicial, vec3(0.4, 0.2, 0.3)); // posicionar a antena à direita do corpo
         this.antenaDireita.theta = vec3(-90, 0, -40); // rotacionar a antena
         this.antenaDireita.vTheta = vec3(0, 0, 0);
         this.antenaDireita.cor.ambiente = vec4(0.8, 0.8, 0.8, 1);
@@ -89,8 +90,8 @@ class Abelha {
         // atualiza a posição das partes
         this.atualizaPosicaoParte(this.asaEsquerda, vec3(-0.6, 0, 0));
         this.atualizaPosicaoParte(this.asaDireita, vec3(0.6, 0, 0));
-        this.atualizaPosicaoParte(this.antenaEsquerda, vec3(-0.4, 0.2, 0.8));
-        this.atualizaPosicaoParte(this.antenaDireita, vec3(0.4, 0.2, 0.8));
+        this.atualizaPosicaoParte(this.antenaEsquerda, vec3(-0.4, 0.2, 0.5));
+        this.atualizaPosicaoParte(this.antenaDireita, vec3(0.4, 0.2, 0.5));
 
         // atualiza a rotação das asas
         this.anguloAsa += this.velocidadeMovAsas * deltaTempo * 10;
@@ -216,7 +217,7 @@ class Caracol {
 
         this.cabeca = new Elemento(new Cilindro(8), gl, pathTexturaCauda);
         this.cabeca.escala = vec3(0.35, 0.35, 1);
-        this.cabeca.trans = add(posicaoInicial, vec3(1, 0, 0));
+        this.cabeca.trans = add(posicaoInicial, vec3(1, 0, 0.50));
 
         this.concha = new Elemento(new Esfera(2), gl, pathTexturaCauda);
         this.concha.escala = vec3(0.75, 0.35, 0.75);

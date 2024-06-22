@@ -107,7 +107,7 @@ class Shader {
         // inicializa
         this.GL = GL;
         GL.viewport(0, 0, largura, altura);
-        GL.clearColor(0.0, 0.0, 0.55, 1.0);
+        GL.clearColor(0.52, 0.80, 0.98, 1.0);
         GL.enable(GL.DEPTH_TEST);
         console.log("Canvas: ", largura, altura);
 
