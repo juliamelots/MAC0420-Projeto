@@ -201,11 +201,10 @@ function updateSimulator() {
         o.atualizaTrans(gSimulator.dt);
         o.atualizaTheta(gSimulator.dt);
     }
-
     
-    
-    if (gSimulator.abelha && !POVs[ABELHA]) 
+    if (gSimulator.abelha)
         gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt);
+    //console.log(gSimulator.abelha.corpo.trans)
 
     if (gSimulator.peixe) 
         gSimulator.peixe.atualizaMovimentoInfinito(gSimulator.dt);
@@ -353,13 +352,15 @@ function callbackAbelha(e) {
     let abelha = gSimulator.abelha
     gSimulator.ship.trans = vec3(8.5, 10, 7);
     gInterface.theta = vec3(70, 0, -180);
-
 }
 
 function callbackCaracol(e) {
     console.log("POV Caracol");
     ativaPOV(CARACOL)
 
+    let caracol = gSimulator.caracol;
+    gSimulator.ship.trans = vec3(-10, 7.7, 2);
+    gInterface.theta = vec3(80, 0, -94);
 }
 
 function callbackPeixe(e) {
@@ -367,9 +368,8 @@ function callbackPeixe(e) {
     ativaPOV(PEIXE);
 
     let peixe = gSimulator.peixe;
-    //gSimulator.ship.redefineTrans(vec3(8.5, 10, 7));
-    //gSimulator.ship.trans = vec3(8.5, 10, 7);
-    //gInterface.theta = vec3(70, 0, -180);
+    gSimulator.ship.trans = vec3(-5, -10, 1.5);
+    gInterface.theta = vec3(78, 0, -1);
 }
 
 function callbackJardim(e) {
