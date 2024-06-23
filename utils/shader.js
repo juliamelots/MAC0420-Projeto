@@ -211,10 +211,16 @@ class Shader {
     /**
      * Renderiza poliedro utilizando uniformes previamente carregados.
      */
-    renderiza(elemento) {
+    renderizaElemento(elemento) {
         this.GL.uniform1i(this.uIsShadow, 0);
         this.GL.uniform1i(this.uHasTexture, elemento.temTextura ? 1 : 0);
         this.GL.drawArrays(gGL.TRIANGLES, elemento.poliedro.inicio, elemento.poliedro.nVertices);
+    }
+
+    /**
+     * Renderiza sombra de poliedro utilizando uniformes previamente carregados.
+     */
+    renderizaSombra(elemento) {
         this.GL.uniform1i(this.uIsShadow, 1);
         this.GL.uniform1i(this.uHasTexture, 0);
         this.GL.drawArrays(gGL.TRIANGLES, elemento.poliedro.inicio, elemento.poliedro.nVertices);

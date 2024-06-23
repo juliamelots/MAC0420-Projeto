@@ -102,6 +102,7 @@ function buildInterface() {
  * Registra os elementos do simulador de voo em seu objeto.
  */
 function buildSimulator() {
+    // câmera
     gSimulator.ship = new Camera(vec3(15, -15, 10), vec3(60, 0, 45));
     //gSimulator.ship = new Camera(vec3(-3, -10, 2), vec3(60, 0, 45)); // olhando peixe
     //gSimulator.ship = new Camera(vec3(7.5, 7.5, 5), vec3(60, 0, 180));
@@ -112,6 +113,7 @@ function buildSimulator() {
     //gInterface.theta = vec3(70, 0, -180);
     gInterface.theta = vec3(60, 0, 45);
 
+    // sol
     let sol = new Elemento(null, gGL, null);
     sol.trans = vec3(0, 0, 65);
     sol.cor.ambiente = vec4(0.2, 0.2, 0.2, 1);
@@ -119,59 +121,64 @@ function buildSimulator() {
     sol.cor.especular = vec4(1, 1, 1, 1);
     gSimulator.sol = sol;
     
-    gSimulator.obstacles = [];
-
+    gSimulator.bases = [];
+    gSimulator.obstaculos = [];
+    gSimulator.animais = [];
+    
     // chão
     let pathTexturaChao = "./assets/grass.jpg";
-    let chao = new Chao(gGL, pathTexturaChao, vec3(0, 0, -2.5));
-    gSimulator.obstacles.push(chao.elemento);
-
+    let chao = new Chao(gGL, pathTexturaChao, vec3(0, 0, -2.52));
+    gSimulator.bases.push(chao.elemento);
+    
     // lago
-    let lago = new Lago(gGL, null, vec3(-6, -7.5, -2.45));
-    gSimulator.obstacles.push(lago.elemento);
+    let lago = new Lago(gGL, null, vec3(-6, -7.5, -2.51));
+    gSimulator.bases.push(lago.elemento);
+    
+    // horta
+    let pathTexturaTerra = "./assets/dirt.jpg";
+    let horta = new Horta(gGL, pathTexturaTerra, null, vec3(8, -5.5, -2.51));
+    gSimulator.bases.push(horta.elementos.at(0));
+    gSimulator.obstaculos.push(...horta.elementos.slice(1));
 
     // árvores
     let arvore1 = new Arvore(gGL, null, null, vec3(-7.5, 0, 1.5));
-    gSimulator.obstacles.push(...arvore1.elementos);
+    gSimulator.obstaculos.push(...arvore1.elementos);
     let arvore2 = new Arvore(gGL, null, null, vec3(1.5, 9.0, 1.5));
-    gSimulator.obstacles.push(...arvore2.elementos);
+    gSimulator.obstaculos.push(...arvore2.elementos);
 
     // pedras
     let pathTexturaPedra = "./assets/rock.jpg";
     let pedra1 = new Pedra(gGL, pathTexturaPedra, vec3(0, -10.5, 0), vec3(0.7, 0.7, 0.7));
-    gSimulator.obstacles.push(pedra1.elemento);
+    gSimulator.obstaculos.push(pedra1.elemento);
     let pedra2 = new Pedra(gGL, pathTexturaPedra, vec3(0, -11.5, 0), vec3(0.5, 0.4, 0.7));
-    gSimulator.obstacles.push(pedra2.elemento);
+    gSimulator.obstaculos.push(pedra2.elemento);
     let pedra3 = new Pedra(gGL, pathTexturaPedra, vec3(0.5, -11.0, 0), vec3(0.6, 0.4, 0.7));
-    gSimulator.obstacles.push(pedra3.elemento);
+    gSimulator.obstaculos.push(pedra3.elemento);
     let pedra4 = new Pedra(gGL, pathTexturaPedra, vec3(0, -3.5, 0), vec3(0.7, 0.7, 0.7));
-    gSimulator.obstacles.push(pedra4.elemento);
+    gSimulator.obstaculos.push(pedra4.elemento);
     let pedra5 = new Pedra(gGL, pathTexturaPedra, vec3(0, -4.5, 0), vec3(0.5, 0.4, 0.7));
-    gSimulator.obstacles.push(pedra5.elemento);
+    gSimulator.obstaculos.push(pedra5.elemento);
     let pedra6 = new Pedra(gGL, pathTexturaPedra, vec3(0.5, -4.0, 0), vec3(0.6, 0.4, 0.7));
-    gSimulator.obstacles.push(pedra6.elemento);
-
-    // horta
-    let pathTexturaTerra = "./assets/dirt.jpg";
-    let horta = new Horta(gGL, pathTexturaTerra, null, vec3(8, -5.5, -2.45));
-    gSimulator.obstacles.push(...horta.elementos);
+    gSimulator.obstaculos.push(pedra6.elemento);
 
     // animais
     let pathTexturaCorpoAbelha = "./assets/bee_body.jpg";
     let pathTexturaAsas = "./assets/bug_wing2.jpg";
     let abelha = new Abelha(gGL, pathTexturaCorpoAbelha, pathTexturaAsas, vec3(7.5, 7.5, 5));
     gSimulator.abelha = abelha;
-    gSimulator.obstacles.push(...abelha.elementos);
+    gSimulator.animais.push(abelha);
 
     let pathTexturaPeixeCorpo = "./assets/fish_texture.jpg";
     let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
     let peixe = new Peixe(gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda, vec3(-6, -7.5, 0));
     gSimulator.peixe = peixe;
-    gSimulator.obstacles.push(...peixe.elementos);
+    gSimulator.animais.push(peixe);
 
-    let caracol = new Caracol(gGL, null, null, vec3(-7.5, 7.5, 0.35));
+    let pathTexturaCaracolCorpo = "./assets/snail_body.jpg";
+    let pathTexturaCaracolConcha = "./assets/snail_shell.jpg";
+    let caracol = new Caracol(gGL, pathTexturaCaracolCorpo, pathTexturaCaracolConcha, vec3(-7.5, 7.5, 0.35));
     gSimulator.caracol = caracol;
-    gSimulator.obstacles.push(...caracol.elementos);
+    gSimulator.animais.push(caracol);
 }
 
 /**
@@ -195,19 +202,17 @@ function updateSimulator() {
 
     gSimulator.ship.atualizaTrans(gSimulator.dt);
     gSimulator.ship.atualizaTheta(gInterface.theta);
-    
-    for (let i = 0; i < gSimulator.obstacles.length; i++) {
-        let o = gSimulator.obstacles.at(i);
+
+    for (let i = 0; i < gSimulator.obstaculos.length; i++) {
+        let o = gSimulator.obstaculos.at(i);
         o.atualizaTrans(gSimulator.dt);
         o.atualizaTheta(gSimulator.dt);
     }
-    
-    if (gSimulator.abelha)
-        gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt);
-    //console.log(gSimulator.abelha.corpo.trans)
 
-    if (gSimulator.peixe) 
-        gSimulator.peixe.atualizaMovimentoInfinito(gSimulator.dt);
+    for (let i = 0; i < gSimulator.animais.length; i++) {
+        let a = gSimulator.animais.at(i);
+        a.atualizaMovimentoInativo(gSimulator.dt);
+    }
 
     if (gInterface.activeStep) {
         gSimulator.dt = 0.0;
@@ -230,13 +235,36 @@ function nextFrame(e) {
     };
     gShader.carregaUniformesGerais(dadosGeral);
 
-    for (let i = 0; i < gSimulator.obstacles.length; i++) {
-        let e = gSimulator.obstacles.at(i);
-        let dadosModelo = e.calculaUniformesModelo(dadosGeral.view);
-        let dadosLuz = gSimulator.sol.calculaUniformesLuz(e);
-        let dadosMaterial = e.calculaUniformesMaterial();
+    for (let i = 0; i < gSimulator.bases.length; i++) {
+        let b = gSimulator.bases.at(i);
+        let dadosModelo = b.calculaUniformesModelo(dadosGeral.view);
+        let dadosLuz = gSimulator.sol.calculaUniformesLuz(b);
+        let dadosMaterial = b.calculaUniformesMaterial();
         gShader.carregaUniformesEspecificos(dadosModelo, dadosLuz, dadosMaterial);
-        gShader.renderiza(e);
+        gShader.renderizaElemento(b);
+    }
+
+    for (let i = 0; i < gSimulator.obstaculos.length; i++) {
+        let o = gSimulator.obstaculos.at(i);
+        let dadosModelo = o.calculaUniformesModelo(dadosGeral.view);
+        let dadosLuz = gSimulator.sol.calculaUniformesLuz(o);
+        let dadosMaterial = o.calculaUniformesMaterial();
+        gShader.carregaUniformesEspecificos(dadosModelo, dadosLuz, dadosMaterial);
+        gShader.renderizaElemento(o);
+        gShader.renderizaSombra(o);
+    }
+
+    for (let i = 0; i < gSimulator.animais.length; i++) {
+        let a = gSimulator.animais.at(i);
+        for (let j = 0; j < a.elementos.length; j++) {
+            let e = a.elementos.at(j);
+            let dadosModelo = e.calculaUniformesModelo(dadosGeral.view);
+            let dadosLuz = gSimulator.sol.calculaUniformesLuz(e);
+            let dadosMaterial = e.calculaUniformesMaterial();
+            gShader.carregaUniformesEspecificos(dadosModelo, dadosLuz, dadosMaterial);
+            gShader.renderizaElemento(e);
+            gShader.renderizaSombra(e);
+        }
     }
 
     window.requestAnimationFrame(nextFrame);
@@ -399,16 +427,6 @@ function randomIn(size, offset = 0) {
 }
 
 /**
- * Gera matriz de rotação conjunta de ângulos arbitrários em cada eixo.
- */
-function rotateXYZ(x, y, z) {
-    let rX = rotateX(x);
-    let rY = rotateY(y);
-    let rZ = rotateZ(z);
-    return mult(rZ, mult(rY, rX));
-}
-
-/**
  * Faz interpolação entre duas cores a partir de um fator de interpolação
  */
 function interpolaCor(cor1, cor2, fator) {
@@ -417,44 +435,6 @@ function interpolaCor(cor1, cor2, fator) {
         corResultado[i] = cor1[i] + fator * (cor2[i] - cor1[i]);
     }
     return corResultado;
-}
-
-/**
- * Gera cubos em extremidades de eixos com cores diferentes.
- * Auxilia em debug.
- */
-function showCoordinateSystem() {
-    gSimulator.ship.trans = vec3(0, 0, 0);
-
-    let a_poly = new Cube([2, 1]);
-    let a = new Obstacle(a_poly);
-    a.trans = vec3(1, 0, 0);
-    gSimulator.obstacles.push(a);
-
-    a_poly = new Cube([3, 1]);
-    a = new Obstacle(a_poly);
-    a.trans = vec3(-1, 0, 0);
-    gSimulator.obstacles.push(a);
-
-    a_poly = new Cube([4, 1]);
-    a = new Obstacle(a_poly);
-    a.trans = vec3(0, 1, 0);
-    gSimulator.obstacles.push(a);
-
-    a_poly = new Cube([5, 1]);
-    a = new Obstacle(a_poly);
-    a.trans = vec3(0, -1, 0);
-    gSimulator.obstacles.push(a);
-
-    a_poly = new Cube([6, 1]);
-    a = new Obstacle(a_poly);
-    a.trans = vec3(0, 0, 1);
-    gSimulator.obstacles.push(a);
-
-    a_poly = new Cube([7, 1]);
-    a = new Obstacle(a_poly);
-    a.trans = vec3(0, 0, -1);
-    gSimulator.obstacles.push(a);
 }
 
 function ativaPOV(pov) {

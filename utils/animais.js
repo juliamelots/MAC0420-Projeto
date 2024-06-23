@@ -77,7 +77,7 @@ class Abelha {
     }
 
     // método para atualizar o movimento da abelha de forma circular (inclui a movimentação das asas também)
-    atualizaMovimentoCircular(deltaTempo) {
+    atualizaMovimentoInativo(deltaTempo) {
         this.anguloMov += this.velocidadeMovCorpo * deltaTempo;
 
         // calcula a nova posição usando funções trigonométricas
@@ -155,28 +155,7 @@ class Peixe {
         this.corpo.theta = vec3(90, -90, -rotCorpo);
     }
 
-    atualizaMovimentoCircular(deltaTempo) {
-        this.anguloMov += this.velocidadeMovCorpo * deltaTempo;
-
-        // calcula a nova posição usando funções trigonométricas
-        let x = this.raioMov * Math.cos(this.anguloMov);
-        let y = this.raioMov * Math.sin(this.anguloMov);
-
-        // atualiza a posição do corpo
-        this.corpo.trans = add(this.posicaoInicial, vec3(x, y, 0));
-
-        // atualiza a posição das partes
-        this.atualizaPosicaoParte(this.cauda, vec3(-1, 0, 0));
-
-        // atualiza a rotação da cauda
-        this.anguloCauda += this.velocidadeMovCauda * deltaTempo * 10;
-        this.atualizaRotacaoCauda();
-
-        this.anguloCorpo += this.velocidadeMovCorpo * deltaTempo * 10;
-        this.atualizaRotacaoCorpo();
-    }
-
-    atualizaMovimentoInfinito(deltaTempo) {
+    atualizaMovimentoInativo(deltaTempo) {
         this.anguloMov += this.velocidadeMovCorpo * deltaTempo;
 
         // calcula a nova posição usando funções trigonométricas
@@ -207,21 +186,30 @@ class Peixe {
 }
 
 class Caracol {
-    constructor(gl, pathTexturaCorpo, pathTexturaCauda, posicaoInicial = vec3(0, 0, 0)) {
+    constructor(gl, pathTexturaCorpo, pathTexturaConcha, posicaoInicial = vec3(0, 0, 0)) {
         this.posicaoInicial = posicaoInicial;
 
         this.corpo = new Elemento(new Cilindro(8), gl, pathTexturaCorpo);
         this.corpo.escala = vec3(0.35, 0.35, 2);
         this.corpo.trans = posicaoInicial;
         this.corpo.theta = vec3(0, 90, 0);
+        this.corpo.cor.ambiente = vec4(1, 1, 1, 1);
+        this.corpo.cor.difusa = vec4(1, 1, 1, 1);
+        this.corpo.cor.especular = 100.0;
 
-        this.cabeca = new Elemento(new Cilindro(8), gl, pathTexturaCauda);
+        this.cabeca = new Elemento(new Cilindro(8), gl, pathTexturaCorpo);
         this.cabeca.escala = vec3(0.35, 0.35, 1);
         this.cabeca.trans = add(posicaoInicial, vec3(1, 0, 0.50));
+        this.cabeca.cor.ambiente = vec4(1, 1, 1, 1);
+        this.cabeca.cor.difusa = vec4(1, 1, 1, 1);
+        this.cabeca.cor.especular = 100.0;
 
-        this.concha = new Elemento(new Esfera(2), gl, pathTexturaCauda);
+        this.concha = new Elemento(new Esfera(2), gl, pathTexturaConcha);
         this.concha.escala = vec3(0.75, 0.35, 0.75);
         this.concha.trans = add(posicaoInicial, vec3(-0.15, 0, 1));
+        this.concha.cor.ambiente = vec4(1, 1, 1, 1);
+        this.concha.cor.difusa = vec4(1, 1, 1, 1);
+        this.concha.cor.especular = 50.0;
 
         // agrupa todos os elementos
         this.elementos = [this.corpo, this.cabeca, this.concha];
@@ -245,6 +233,7 @@ class Caracol {
     }
 
     atualizaMovimentoInativo(deltaTempo) {
+        return;
         // calcula a nova posição usando funções trigonométricas
         let x = this.semiEixoX * Math.cos(deltaTempo);
         let y = this.semiEixoY * Math.sin(deltaTempo);

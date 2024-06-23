@@ -3,6 +3,16 @@ const Y = 1;
 const Z = 2;
 const I = mat4();
 
+/**
+ * Gera matriz de rotação conjunta de ângulos arbitrários em cada eixo.
+ */
+function rotateXYZ(x, y, z) {
+    let rX = rotateX(x);
+    let rY = rotateY(y);
+    let rZ = rotateZ(z);
+    return mult(rZ, mult(rY, rX));
+}
+
 class Camera {
     constructor(trans = vec3(0, 0, 0), theta = vec3(0, 0, 0)) {
         this.trans = trans;
