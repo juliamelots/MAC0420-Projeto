@@ -73,7 +73,7 @@ function buildInterface() {
     gInterface.activeStep = false;
     gInterface.canvas = document.getElementById("glCanvas");
     gInterface.slider = document.getElementById("sun");
-    gInterface.slider.value = 10.0;
+    gInterface.slider.value = 0.0;
 
     gInterface.abelha = document.getElementById("btAbelha");
     gInterface.caracol = document.getElementById("btCaracol");
@@ -115,7 +115,7 @@ function buildSimulator() {
 
     // sol
     let sol = new Elemento(null, gGL, null);
-    sol.trans = vec3(0, 0, 65);
+    sol.trans = vec3(75, 0, 30);
     sol.cor.ambiente = vec4(0.2, 0.2, 0.2, 1);
     sol.cor.difusa = vec4(1, 1, 1, 1);
     sol.cor.especular = vec4(1, 1, 1, 1);
@@ -353,26 +353,51 @@ function callbackKBoard(e) {
 
 
 function callbackChangeDay(e) {
-    let delta = gInterface.slider.max - gInterface.slider.min;
-    let alfa = (gInterface.slider.value - gInterface.slider.min) / delta;
+    let porcentagem = gInterface.slider.value; // valor do slider de 0.0 a 100.0
+    let alfa = porcentagem / 100.0; // converte a porcentagem para um valor de 0.0 a 1.0
 
-    // cores em diferentes momentos do dia
-    const corMaxIluminacao = [1.0, 1.0, 0.8]; 
-    const corMinIluminacao = [0.5, 0.0, 0.5]; 
+    // cores em diferentes momentos do dia para o Sol
+    const corManha = [0.8, 0.8, 0.8];
+    const corMaxIluminacao = [1.0, 1.0, 1.0]; 
+    const corNoite = [0.5, 0.0, 0.5]; 
 
-    // interpolação entre o máximo de iluminação e o mínimo de iluminação
-    let corInterpolada = interpolaCor(corMaxIluminacao, corMinIluminacao, alfa);
+    // interpolação entre as cores do Sol ao longo do dia
+    let corSol;
+    if (alfa < 0.5) {
+        corSol = interpolaCor(corManha, corMaxIluminacao, alfa * 2);
+    } else {
+        corSol = interpolaCor(corMaxIluminacao, corNoite, (alfa - 0.5) * 2);
+    }
 
-    let nova_difusao = vec4(corInterpolada[0], corInterpolada[1], corInterpolada[2], 1);
+    let nova_difusao = vec4(corSol[0], corSol[1], corSol[2], 1);
     gSimulator.sol.cor.difusa = nova_difusao;
 
-    // atualiza a cor de fundo do canvas
+    // cores em diferentes momentos do dia para o Background
+    const corBackgroundManha = [0.6, 0.8, 1.0];
     const corBackgroundDia = [0.52, 0.80, 0.98]; 
     const corBackgroundNoite = [0.3, 0.0, 0.3]; 
-    let corBackground = interpolaCor(corBackgroundDia, corBackgroundNoite, alfa);
+
+    // interpolação entre as cores do Background ao longo do dia
+    let corBackground;
+    if (alfa < 0.5) {
+        corBackground = interpolaCor(corBackgroundManha, corBackgroundDia, alfa * 2);
+    } else {
+        corBackground = interpolaCor(corBackgroundDia, corBackgroundNoite, (alfa - 0.5) * 2);
+    }
 
     gGL.clearColor(corBackground[0], corBackground[1], corBackground[2], 1.0);
-    gGL.clear(gSimulator.GL.COLOR_BUFFER_BIT | gSimulator.GL.DEPTH_BUFFER_BIT);
+    gGL.clear(gGL.COLOR_BUFFER_BIT | gGL.DEPTH_BUFFER_BIT);
+
+    // altera a posição do Sol para uma trajetória semicircular
+    const raio = 75.0; // define o raio da trajetória semicircular
+    const angulo = alfa * Math.PI; // alfa varia de 0 a 1, angulo varia de 0 a π
+
+    const posicaoSolX = raio * Math.cos(angulo);
+    const posicaoSolY = 0; // o Sol se move apenas no eixo X e Z
+    const posicaoSolZ = 30 + (45 * Math.sin(angulo)); // 30 é a altura mínima e 75 a altura máxima do sol
+
+    gSimulator.sol.trans = vec3(posicaoSolX, posicaoSolY, posicaoSolZ);
+    console.log(gSimulator.sol.trans);
 }
 
 function callbackAbelha(e) {
@@ -429,10 +454,10 @@ function randomIn(size, offset = 0) {
 }
 
 /**
- * Faz interpolação entre duas cores a partir de um fator de interpolação
+ * Faz interpolação entre duas cores a partir de um fator de interpolação (usando interpolação linear)
  */
 function interpolaCor(cor1, cor2, fator) {
-    let corResultado = cor1.slice(); // Cria uma cópia de color1
+    let corResultado = cor1.slice(); // cria uma cópia de color1
     for (let i = 0; i < 3; i++) {
         corResultado[i] = cor1[i] + fator * (cor2[i] - cor1[i]);
     }
