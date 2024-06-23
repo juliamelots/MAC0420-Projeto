@@ -11,7 +11,7 @@ window.onload = main;
 /* ==================================================================
   Constantes e variáveis globais
 */
-const STEP_VTRANS = 10.0;
+const STEP_VTRANS = 5.0;
 const STEP_THETA = 1.0;
 const G = 0.0;
 
@@ -39,6 +39,19 @@ var gShader = new Shader();
 var gInterface = { theta: vec3(0.0, 0.0, 0.0) };
 var gSimulator = { time: 0.0, dt: 0.0 };
 
+const JARDIM = 0;
+const ABELHA = 1;
+const CARACOL = 2;
+const PEIXE = 3;
+
+var POVs = [
+    true,   // jardim
+    false,  // abelha
+    false,  // caracol
+    false,  // peixe
+]
+
+
 /* ==================================================================
   Funções principais
 */
@@ -62,6 +75,11 @@ function buildInterface() {
     gInterface.slider = document.getElementById("sun");
     gInterface.slider.value = 10.0;
 
+    gInterface.abelha = document.getElementById("btAbelha");
+    gInterface.caracol = document.getElementById("btCaracol");
+    gInterface.peixe = document.getElementById("btPeixe");
+    gInterface.jardim = document.getElementById("btJardim");
+
     // canvas
     gGL = gInterface.canvas.getContext("webgl2");
     if (!gGL)
@@ -71,6 +89,12 @@ function buildInterface() {
     gInterface.run.onclick = callbackRun;
     gInterface.step.onclick = callbackStep;
     gInterface.slider.onchange = callbackChangeDay;
+
+    gInterface.abelha.onclick = callbackAbelha;
+    gInterface.caracol.onclick = callbackCaracol;
+    gInterface.peixe.onclick = callbackPeixe;
+    gInterface.jardim.onclick = callbackJardim;
+
     onkeypress = callbackKBoard;
 }
 
@@ -79,6 +103,13 @@ function buildInterface() {
  */
 function buildSimulator() {
     gSimulator.ship = new Camera(vec3(15, -15, 10), vec3(60, 0, 45));
+    //gSimulator.ship = new Camera(vec3(-3, -10, 2), vec3(60, 0, 45)); // olhando peixe
+    //gSimulator.ship = new Camera(vec3(7.5, 7.5, 5), vec3(60, 0, 180));
+    //gSimulator.ship = new Camera(vec3(9.5, 16.8, 2.2), vec3(83, 0, 163));
+    //gSimulator.ship = new Camera(vec3(8.5, 10, 7), vec3(60, 0, 45));
+
+    // muda o AT da camera
+    //gInterface.theta = vec3(70, 0, -180);
     gInterface.theta = vec3(60, 0, 45);
 
     let sol = new Elemento(null, gGL, null);
@@ -171,7 +202,9 @@ function updateSimulator() {
         o.atualizaTheta(gSimulator.dt);
     }
 
-    if (gSimulator.abelha) 
+    
+    
+    if (gSimulator.abelha && !POVs[ABELHA]) 
         gSimulator.abelha.atualizaMovimentoCircular(gSimulator.dt);
 
     if (gSimulator.peixe) 
@@ -286,6 +319,7 @@ function callbackKBoard(e) {
     }
     else
         console.log("Tecla de controle inválida.");
+    console.log(gSimulator.ship.trans)
 }
 
 
@@ -312,6 +346,39 @@ function callbackChangeDay(e) {
     gGL.clear(gSimulator.GL.COLOR_BUFFER_BIT | gSimulator.GL.DEPTH_BUFFER_BIT);
 }
 
+function callbackAbelha(e) {
+    console.log("POV Abelha");
+    ativaPOV(ABELHA);
+
+    let abelha = gSimulator.abelha
+    gSimulator.ship.trans = vec3(8.5, 10, 7);
+    gInterface.theta = vec3(70, 0, -180);
+
+}
+
+function callbackCaracol(e) {
+    console.log("POV Caracol");
+    ativaPOV(CARACOL)
+
+}
+
+function callbackPeixe(e) {
+    console.log("POV Peixe");
+    ativaPOV(PEIXE);
+
+    let peixe = gSimulator.peixe;
+    //gSimulator.ship.redefineTrans(vec3(8.5, 10, 7));
+    //gSimulator.ship.trans = vec3(8.5, 10, 7);
+    //gInterface.theta = vec3(70, 0, -180);
+}
+
+function callbackJardim(e) {
+    console.log("POV Jardim");
+    ativaPOV(JARDIM);
+
+    gSimulator.ship.trans = vec3(15, -15, 10);
+    gInterface.theta = vec3(60, 0, 45);
+}
 
 /* ==================================================================
   Funções auxiliares
@@ -388,4 +455,17 @@ function showCoordinateSystem() {
     a = new Obstacle(a_poly);
     a.trans = vec3(0, 0, -1);
     gSimulator.obstacles.push(a);
+}
+
+function ativaPOV(pov) {
+    for(let i = 0; i < 4; i++) {
+        if(i == pov) {
+            POVs[i] = true;
+            //console.log("ativou")
+        }
+        else {
+            POVs[i] = false;
+            //console.log("desativou")
+        }
+    }
 }
