@@ -162,21 +162,21 @@ function buildSimulator() {
     gSimulator.obstaculos.push(pedra6.elemento);
 
     // animais
-    let pathTexturaCorpoAbelha = "./assets/bee_body.jpg";
-    let pathTexturaAsas = "./assets/bug_wing2.jpg";
-    let abelha = new Abelha(gGL, pathTexturaCorpoAbelha, pathTexturaAsas, vec3(7.5, 7.5, 5));
+    let pathTexturaAbelhaCorpo = "./assets/bee_body.jpg";
+    let pathTexturaAbelhaAsas = "./assets/bug_wing2.jpg";
+    let abelha = new Abelha(vec3(7.5, 7.5, 5), gGL, pathTexturaAbelhaCorpo, pathTexturaAbelhaAsas);
     gSimulator.abelha = abelha;
     gSimulator.animais.push(abelha);
 
     let pathTexturaPeixeCorpo = "./assets/fish_texture.jpg";
     let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
-    let peixe = new Peixe(gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda, vec3(-6, -7.5, 0));
+    let peixe = new Peixe(vec3(-6, -7.5, 0), gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda);
     gSimulator.peixe = peixe;
     gSimulator.animais.push(peixe);
 
     let pathTexturaCaracolCorpo = "./assets/snail_body.jpg";
     let pathTexturaCaracolConcha = "./assets/snail_shell.jpg";
-    let caracol = new Caracol(gGL, pathTexturaCaracolCorpo, pathTexturaCaracolConcha, vec3(-7.5, 7.5, 0.35));
+    let caracol = new Caracol(vec3(-7.5, 7.5, 0.35), gGL, pathTexturaCaracolCorpo, pathTexturaCaracolConcha);
     gSimulator.caracol = caracol;
     gSimulator.animais.push(caracol);
 }
@@ -256,9 +256,11 @@ function nextFrame(e) {
 
     for (let i = 0; i < gSimulator.animais.length; i++) {
         let a = gSimulator.animais.at(i);
+        let dadosModeloAnimal = a.calculaUniformesModelo(dadosGeral.view);
         for (let j = 0; j < a.elementos.length; j++) {
             let e = a.elementos.at(j);
             let dadosModelo = e.calculaUniformesModelo(dadosGeral.view);
+            dadosModelo = a.aplicaModeloSobreElemento(dadosGeral.view, dadosModeloAnimal, dadosModelo);
             let dadosLuz = gSimulator.sol.calculaUniformesLuz(e);
             let dadosMaterial = e.calculaUniformesMaterial();
             gShader.carregaUniformesEspecificos(dadosModelo, dadosLuz, dadosMaterial);

@@ -49,7 +49,7 @@ class Camera {
 }
 
 class Elemento {
-    constructor(poliedro = null, gl, pathTextura) {
+    constructor(poliedro, gl, pathTextura) {
         // atributos físicos
         this.escala = vec3(1, 1, 1);
         this.trans = vec3(0, 0, 0);
@@ -65,7 +65,7 @@ class Elemento {
         this.cor = {
             ambiente: vec4(0, 0, 0, 1),
             difusa: vec4(0, 0, 0, 1),
-            especular: 50.0,
+            especular: 50.0
         };
     }
 
