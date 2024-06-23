@@ -167,18 +167,18 @@ function buildSimulator() {
     let abelha = new Abelha(vec3(7.5, 7.5, 5), gGL, pathTexturaAbelhaCorpo, pathTexturaAbelhaAsas);
     gSimulator.abelha = abelha;
     gSimulator.animais.push(abelha);
+    
+    let pathTexturaCaracolCorpo = "./assets/snail_body.jpg";
+    let pathTexturaCaracolConcha = "./assets/snail_shell.jpg";
+    let caracol = new Caracol(vec3(-7.5, 7.5, 0.35), gGL, pathTexturaCaracolCorpo, pathTexturaCaracolConcha);
+    gSimulator.caracol = caracol;
+    gSimulator.animais.push(caracol);
 
     let pathTexturaPeixeCorpo = "./assets/fish_texture.jpg";
     let pathTexturaPeixeCauda = "./assets/fish_texture.jpg";
     let peixe = new Peixe(vec3(-6, -7.5, 0), gGL, pathTexturaPeixeCorpo, pathTexturaPeixeCauda);
     gSimulator.peixe = peixe;
     gSimulator.animais.push(peixe);
-
-    let pathTexturaCaracolCorpo = "./assets/snail_body.jpg";
-    let pathTexturaCaracolConcha = "./assets/snail_shell.jpg";
-    let caracol = new Caracol(vec3(-7.5, 7.5, 0.35), gGL, pathTexturaCaracolCorpo, pathTexturaCaracolConcha);
-    gSimulator.caracol = caracol;
-    gSimulator.animais.push(caracol);
 }
 
 /**
@@ -211,7 +211,12 @@ function updateSimulator() {
 
     for (let i = 0; i < gSimulator.animais.length; i++) {
         let a = gSimulator.animais.at(i);
-        a.atualizaMovimentoInativo(gSimulator.dt);
+        if (POVs[i+1]) {
+            a.atualizaPOV(gSimulator.ship)
+        }
+        else {
+            a.atualizaMovimentoInativo(gSimulator.dt);
+        }
     }
 
     if (gInterface.activeStep) {
@@ -414,8 +419,8 @@ function callbackCaracol(e) {
     ativaPOV(CARACOL)
 
     let caracol = gSimulator.caracol;
-    gSimulator.ship.trans = vec3(-10, 7.7, 2);
-    gInterface.theta = vec3(80, 0, -94);
+    caracol.atualizaPOV(gSimulator.ship)
+    gInterface.theta = caracol.theta;
 }
 
 function callbackPeixe(e) {
@@ -423,8 +428,19 @@ function callbackPeixe(e) {
     ativaPOV(PEIXE);
 
     let peixe = gSimulator.peixe;
-    gSimulator.ship.trans = vec3(-5, -10, 1.5);
-    gInterface.theta = vec3(78, 0, -1);
+    //gSimulator.ship.trans = vec3(-5, -10, 1.5);
+    //gInterface.theta = vec3(78, 0, -1);
+
+    peixe.atualizaPOV(gSimulator.ship)
+    gInterface.theta = peixe.theta;
+
+    //let rZ = rotateZ(peixe.theta[Z]);
+    //let rX = rotateX(peixe.theta[X]);
+    //let offsetCamera = mult(rZ, mult(rX, vec4(0, -1, 5, 1)));
+
+    // posicionar camera com offset
+    //gSimulator.ship.trans = add(peixe.trans, vec3(offsetCamera[X], offsetCamera[Y], offsetCamera[Z]));
+    //gSimulator.theta = vec3(90, 0, -90)
 }
 
 function callbackJardim(e) {
