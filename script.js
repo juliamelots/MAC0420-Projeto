@@ -103,13 +103,7 @@ function buildInterface() {
 function buildSimulator() {
     // câmera
     gSimulator.ship = new Camera(vec3(15, -15, 10), vec3(60, 0, 45));
-    //gSimulator.ship = new Camera(vec3(-3, -10, 2), vec3(60, 0, 45)); // olhando peixe
-    //gSimulator.ship = new Camera(vec3(7.5, 7.5, 5), vec3(60, 0, 180));
-    //gSimulator.ship = new Camera(vec3(9.5, 16.8, 2.2), vec3(83, 0, 163));
-    //gSimulator.ship = new Camera(vec3(8.5, 10, 7), vec3(60, 0, 45));
 
-    // muda o AT da camera
-    //gInterface.theta = vec3(70, 0, -180);
     gInterface.theta = vec3(60, 0, 45);
     gInterface.vTrans = 0.0;
 
@@ -384,14 +378,6 @@ function controlaPeixeCaracol(e) {
         gInterface.vTrans += STEP_VTRANS;
         console.log("Tecla L: VEL+", gInterface.vTrans);
     }
-/*     else if (key == `w`) {
-        gInterface.theta[X] += STEP_THETA;
-        console.log("Tecla W: ROT(X)+ sobe", gInterface.theta);
-    } */
-/*     else if (key == `x`) {
-        gInterface.theta[X] -= STEP_THETA;
-        console.log("Tecla X: ROT(X)- desce", gInterface.theta);
-    } */
     else if (key == `a`) {
         gInterface.theta[Z] += STEP_THETA;
         console.log("Tecla Z: ROT(Z)+ anti-horário", gInterface.theta);
@@ -507,6 +493,9 @@ function interpolaCor(cor1, cor2, fator) {
     return corResultado;
 }
 
+/**
+ * ativa o POV de um animal especifico e desativa os demais POVs
+ */
 function ativaPOV(pov) {
     for(let i = 0; i < 4; i++) {
         if(i == pov)
