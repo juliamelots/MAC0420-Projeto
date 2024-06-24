@@ -31,7 +31,10 @@ class Animal extends Elemento {
     }
 
     atualizaTrans(deltaTempo, camera) {
+        // calcula a posição do animal usando direção da câmera
         this.trans = add(this.trans, mult(camera.vTrans * deltaTempo, camera.frente));
+
+        // atualiza a rotação da parte destaque do animal
         this.atualizaRotacaoParte(deltaTempo);
     }
 }
@@ -94,7 +97,9 @@ class Abelha extends Animal{
         this.asaDireita.theta = vec3(90, -90, -rotAsa);
     }
 
-    // move abelha em elipse quando seu POV está inativo 
+    /**
+     * Move abelha em elipse quando seu POV está inativo.
+     */
     atualizaMovimentoInativo(deltaTempo) {
         // calcula a posição usando funções trigonométricas
         this.angMov += this.vMov * deltaTempo;
@@ -105,7 +110,8 @@ class Abelha extends Animal{
         // calcula a rotação usando derivada de funções trigonométricas
         let dx = -this.raioMov * Math.sin(this.angMov);
         let dy = this.raioMov * Math.cos(this.angMov);
-        this.theta = vec3(90, 0, Math.atan2(dy, dx) * 180 / Math.PI); // ângulo entre (x, y) e eixo 
+        let angDir = Math.atan2(dy, dx) * 180 / Math.PI; // ângulo entre (x, y) e eixo X
+        this.theta = vec3(0, 0, angDir);
 
         // atualiza a rotação das asas
         this.atualizaRotacaoParte(deltaTempo);
@@ -140,14 +146,15 @@ class Peixe extends Animal{
         this.vCauda = 5;
     }
 
-    // método para atualizar a rotação da cauda
     atualizaRotacaoParte(deltaTempo) {
         this.angCauda += this.vCauda * deltaTempo;
         let rotCauda = 20 * Math.sin(this.angCauda); // 20 é a amplitude de rotação da cauda
         this.cauda.theta = vec3(0, 0, this.corpo.theta[2] + rotCauda - 90);
     }
 
-    // move peixe em infinito/figure-8 quando seu POV está inativo 
+    /**
+     * Move peixe em infinito/figure-8 quando seu POV está inativo.
+     */
     atualizaMovimentoInativo(deltaTempo) {
         // calcula a posição usando funções trigonométricas
         this.angMov += this.vMov * deltaTempo;
@@ -209,7 +216,9 @@ class Caracol extends Animal{
         this.cabeca.theta = vec3(rotCabeca, 0, 0);
     }
 
-    // move caracol em elipse quando seu POV está inativo 
+    /**
+     * Move caracol em elipse quando seu POV está inativo.
+     */
     atualizaMovimentoInativo(deltaTempo) {
         // calcula a posição usando funções trigonométricas
         this.angMov += this.vMov * deltaTempo;
