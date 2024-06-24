@@ -39,46 +39,47 @@ class Animal extends Elemento {
     }
 }
 
-class Abelha extends Animal{
+class Abelha extends Animal {
     constructor(transInicial, gl, pathTexturaCorpo, pathTexturaAsas) {
         super(transInicial, gl);
 
         // cria o corpo da abelha
         this.corpo = new Elemento(new Esfera(2, 1), gl, pathTexturaCorpo);
-        this.corpo.escala = vec3(0.5, 0.5, 1); // escalar para formar o corpo da abelha
-        this.corpo.trans = vec3(0, 0, 0); // posicionar o corpo na posição inicial
+        this.corpo.escala = vec3(0.5, 0.55, 0.7); 
+        this.corpo.trans = vec3(0, 0, 0); 
+        this.corpo.theta = vec3(90, 0, 0);
         this.corpo.cor = NEUTRO;
         this.elementos.push(this.corpo);
 
         // cria asa esquerda
         this.asaEsquerda = new Elemento(new Piramide(1), gl, pathTexturaAsas);
-        this.asaEsquerda.escala = vec3(0.2, 0.4, 0.1); // escalar para formar a asa
-        this.asaEsquerda.trans = vec3(-0.6, 0, 0); // posicionar a asa à esquerda do corpo
-        this.asaEsquerda.theta = vec3(0, 0, -90); // rotacionar a asa
+        this.asaEsquerda.escala = vec3(0.2, 0.4, 0.1); 
+        this.asaEsquerda.trans = vec3(-0.6, 0, 0); 
+        this.asaEsquerda.theta = vec3(90, 0, 0); 
         this.asaEsquerda.cor = NEUTRO;
         this.elementos.push(this.asaEsquerda);
 
         // cria asa direita
         this.asaDireita = new Elemento(new Piramide(1), gl, pathTexturaAsas);
-        this.asaDireita.escala = vec3(0.25, 0.4, 0.1); // escalar para formar a asa
-        this.asaDireita.trans = vec3(0.6, 0, 0); // posicionar a asa à direita do corpo
-        this.asaDireita.theta = vec3(0, 0, 90); // rotacionar a asa
+        this.asaDireita.escala = vec3(0.25, 0.4, 0.1); 
+        this.asaDireita.trans = vec3(0.6, 0, 0); 
+        this.asaDireita.theta = vec3(90, 0, 0); 
         this.asaDireita.cor = NEUTRO;
         this.elementos.push(this.asaDireita);
 
         // cria antena esquerda
         this.antenaEsquerda = new Elemento(new Cilindro(8), gl, null);
-        this.antenaEsquerda.escala = vec3(0.05, 0.05, 0.3); // escalar para formar a antena
-        this.antenaEsquerda.trans = vec3(-0.4, 0.2, 0.3); // posicionar a antena à esquerda do corpo
-        this.antenaEsquerda.theta = vec3(90, 0, 40); // rotacionar a antena
+        this.antenaEsquerda.escala = vec3(0.05, 0.05, 0.3); 
+        this.antenaEsquerda.trans = vec3(-0.4, 0.4, 0.3); 
+        this.antenaEsquerda.theta = vec3(90, 0, 40); 
         this.antenaEsquerda.cor = NEUTRO;
         this.elementos.push(this.antenaEsquerda);
 
         // cria antena direita
         this.antenaDireita = new Elemento(new Cilindro(8), gl, null);
-        this.antenaDireita.escala = vec3(0.05, 0.05, 0.3); // escalar para formar a antena
-        this.antenaDireita.trans = vec3(0.4, 0.2, 0.3); // posicionar a antena à direita do corpo
-        this.antenaDireita.theta = vec3(-90, 0, -40); // rotacionar a antena
+        this.antenaDireita.escala = vec3(0.05, 0.05, 0.3); 
+        this.antenaDireita.trans = vec3(0.4, 0.4, 0.3); 
+        this.antenaDireita.theta = vec3(-90, 0, -40); 
         this.antenaDireita.cor = NEUTRO;
         this.elementos.push(this.antenaDireita);
         
@@ -93,8 +94,8 @@ class Abelha extends Animal{
     atualizaRotacaoParte(deltaTempo) {
         this.angAsa += this.vAsa * deltaTempo;
         let rotAsa = 30 * Math.sin(this.angAsa); // 30 é a amplitude de rotação da asa
-        this.asaEsquerda.theta = vec3(90, 90, rotAsa);
-        this.asaDireita.theta = vec3(90, -90, -rotAsa);
+        this.asaEsquerda.theta = vec3(rotAsa, 0, -90); 
+        this.asaDireita.theta = vec3(rotAsa, 0, 90); 
     }
 
     /**
@@ -111,7 +112,7 @@ class Abelha extends Animal{
         let dx = -this.raioMov * Math.sin(this.angMov);
         let dy = this.raioMov * Math.cos(this.angMov);
         let angDir = Math.atan2(dy, dx) * 180 / Math.PI; // ângulo entre (x, y) e eixo X
-        this.theta = vec3(0, 0, angDir);
+        this.theta = vec3(0, 0, angDir - 90);
 
         // atualiza a rotação das asas
         this.atualizaRotacaoParte(deltaTempo);
