@@ -20,15 +20,14 @@ class Animal extends Elemento {
     }
 
     atualizaPOV(camera) {
-    let rZ = rotateZ(this.theta[Z]);
-    let rX = rotateX(this.theta[X]);
-    let offsetCamera = mult(rZ, mult(rX, vec4(0, -5, 2, 1)));
+        // posiciona câmera atrás e acima de animal, considerando sua rotação
+        let rZ = rotateZ(this.theta[Z]);
+        let rX = rotateX(this.theta[X]);
+        let offset = mult(rZ, mult(rX, vec4(0, -5, 2, 1)));
+        camera.trans = add(this.trans, vec3(offset[X], offset[Y], offset[Z]));
 
-    // posicionar camera com offset
-    camera.trans = add(this.trans, vec3(offsetCamera[X], offsetCamera[Y], offsetCamera[Z]));
-    camera.atualizaTheta(vec3(this.theta[X] + 75, this.theta[Y], this.theta[Z]));
-
-    camera.vTrans = gInterface.vTrans;
+        // rotaciona câmera de acordo com animal
+        camera.atualizaTheta(vec3(this.theta[X] + 75, this.theta[Y], this.theta[Z]));
     }
 
     atualizaTrans(deltaTempo, camera) {

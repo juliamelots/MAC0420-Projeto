@@ -87,7 +87,7 @@ function buildInterface() {
     // registro das funções de callback
     gInterface.run.onclick = callbackRun;
     gInterface.step.onclick = callbackStep;
-    gInterface.slider.onchange = callbackChangeDay;
+    gInterface.slider.onchange = callbackMudaDia;
 
     gInterface.abelha.onclick = callbackAbelha;
     gInterface.caracol.onclick = callbackCaracol;
@@ -215,6 +215,8 @@ function updateSimulator() {
     for (let i = 0; i < gSimulator.animais.length; i++) {
         let a = gSimulator.animais.at(i);
         if (POVs[i+1]) {
+            gSimulator.ship.vTrans = gInterface.vTrans;
+            gInterface.theta = a.theta;
             a.atualizaPOV(gSimulator.ship);
             a.atualizaTrans(gSimulator.dt, gSimulator.ship);
         }
@@ -362,7 +364,7 @@ function callbackKBoard(e) {
 }
 
 
-function callbackChangeDay(e) {
+function callbackMudaDia(e) {
     let porcentagem = gInterface.slider.value; // valor do slider de 0.0 a 100.0
     let alfa = porcentagem / 100.0; // converte a porcentagem para um valor de 0.0 a 1.0
 
@@ -411,35 +413,25 @@ function callbackChangeDay(e) {
 }
 
 function callbackAbelha(e) {
-    console.log("POV Abelha");
+    console.log("POV da câmera: Abelha");
     ativaPOV(ABELHA);
-
-    let abelha = gSimulator.abelha
-    gSimulator.ship.trans = vec3(8.5, 10, 7);
-    gInterface.theta = vec3(70, 0, -180);
+    gSimulator.abelha.atualizaPOV(gSimulator.ship);
 }
 
 function callbackCaracol(e) {
-    console.log("POV Caracol");
-    ativaPOV(CARACOL)
-
-    let caracol = gSimulator.caracol;
-    caracol.atualizaPOV(gSimulator.ship)
-    gInterface.theta = caracol.theta;
+    console.log("POV da câmera: Caracol");
+    ativaPOV(CARACOL);
+    gSimulator.caracol.atualizaPOV(gSimulator.ship);
 }
 
 function callbackPeixe(e) {
-    console.log("POV Peixe");
+    console.log("POV da câmera: Peixe");
     ativaPOV(PEIXE);
-
-    let peixe = gSimulator.peixe;
-
-    peixe.atualizaPOV(gSimulator.ship)
-    gInterface.theta = peixe.theta;
+    gSimulator.peixe.atualizaPOV(gSimulator.ship);
 }
 
 function callbackJardim(e) {
-    console.log("POV Jardim");
+    console.log("POV  da câmera: Jardim");
     ativaPOV(JARDIM);
 
     gSimulator.ship.trans = vec3(15, -15, 10);
@@ -477,13 +469,9 @@ function interpolaCor(cor1, cor2, fator) {
 
 function ativaPOV(pov) {
     for(let i = 0; i < 4; i++) {
-        if(i == pov) {
+        if(i == pov)
             POVs[i] = true;
-            //console.log("ativou")
-        }
-        else {
+        else
             POVs[i] = false;
-            //console.log("desativou")
-        }
     }
 }
