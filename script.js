@@ -427,18 +427,27 @@ function callbackAbelha(e) {
     console.log("POV da câmera: Abelha");
     ativaPOV(ABELHA);
     gSimulador.abelha.atualizaPOV(gSimulador.camera);
+
+    gInterface.vTrans = 0.0;
+    gSimulador.camera.vTrans = gInterface.vTrans;
 }
 
 function callbackCaracol(e) {
     console.log("POV da câmera: Caracol");
     ativaPOV(CARACOL);
     gSimulador.caracol.atualizaPOV(gSimulador.camera);
+
+    gInterface.vTrans = 0.0;
+    gSimulador.camera.vTrans = gInterface.vTrans;
 }
 
 function callbackPeixe(e) {
     console.log("POV da câmera: Peixe");
     ativaPOV(PEIXE);
     gSimulador.peixe.atualizaPOV(gSimulador.camera);
+
+    gInterface.vTrans = 0.0;
+    gSimulador.camera.vTrans = gInterface.vTrans;
 }
 
 function callbackJardim(e) {
