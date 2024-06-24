@@ -27,7 +27,7 @@ class Animal extends Elemento {
         camera.trans = add(this.trans, vec3(offset[X], offset[Y], offset[Z]));
 
         // rotaciona câmera de acordo com animal
-        camera.atualizaTheta(vec3(this.theta[X] + 75, this.theta[Y], this.theta[Z]));
+        camera.atualizaTheta(vec3(this.theta[X] + 90, this.theta[Y], this.theta[Z]));
     }
 
     atualizaTrans(deltaTempo, camera) {
