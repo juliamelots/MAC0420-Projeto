@@ -32,6 +32,7 @@ class Animal extends Elemento {
 
     atualizaTrans(deltaTempo, camera) {
         this.trans = add(this.trans, mult(camera.vTrans * deltaTempo, camera.frente));
+        this.atualizaRotacaoParte(deltaTempo);
     }
 }
 
@@ -82,19 +83,18 @@ class Abelha extends Animal{
         this.raioMov = 2; 
         this.angMov = 0;
         this.vMov = 0.5; 
-        this.anguloAsa = 0;
-        this.velocidadeMovAsas = 1.75;
+        this.angAsa = 0;
+        this.vAsa = 17.5;
     }
 
-    // método para atualizar a rotação das asas
-    atualizaRotacaoAsas(deltaTempo) {
-        this.anguloAsa += this.velocidadeMovAsas * deltaTempo * 10;
-        let rotAsa = 30 * Math.sin(this.anguloAsa); // 30 é a amplitude de rotação da asa
+    atualizaRotacaoParte(deltaTempo) {
+        this.angAsa += this.vAsa * deltaTempo;
+        let rotAsa = 30 * Math.sin(this.angAsa); // 30 é a amplitude de rotação da asa
         this.asaEsquerda.theta = vec3(90, 90, rotAsa);
         this.asaDireita.theta = vec3(90, -90, -rotAsa);
     }
 
-    // método para atualizar o movimento da abelha de forma circular (inclui a movimentação das asas também)
+    // move abelha em elipse quando seu POV está inativo 
     atualizaMovimentoInativo(deltaTempo) {
         // calcula a posição usando funções trigonométricas
         this.angMov += this.vMov * deltaTempo;
@@ -108,7 +108,7 @@ class Abelha extends Animal{
         this.theta = vec3(90, 0, Math.atan2(dy, dx) * 180 / Math.PI); // ângulo entre (x, y) e eixo 
 
         // atualiza a rotação das asas
-        this.atualizaRotacaoAsas(deltaTempo);
+        this.atualizaRotacaoParte(deltaTempo);
     }
 }
 
@@ -120,78 +120,49 @@ class Peixe extends Animal{
         this.corpo = new Elemento(new Esfera(2, 1), gl, pathTexturaCorpo);
         this.corpo.escala = vec3(1, 0.5, 1);
         this.corpo.trans = vec3(0, 0, 0);
-        this.corpo.theta = vec3(0, 0, 0);
-        this.corpo.vTheta = vec3(0, 0, 0);
+        this.corpo.theta = vec3(0, 0, 90);
         this.corpo.cor = NEUTRO;
         this.elementos.push(this.corpo);
 
         // cria cauda do peixe
         this.cauda = new Elemento(new Piramide(1), gl, pathTexturaCauda);
         this.cauda.escala = vec3(0.5, 0.4, 0.5);
-        this.cauda.trans = vec3(1, 0, 0);
+        this.cauda.trans = vec3(0, -1, 0);
         this.cauda.theta = vec3(0, 0, 90);
-        this.cauda.vTheta = vec3(0, 0, 0);
         this.cauda.cor = NEUTRO;
         this.elementos.push(this.cauda);
 
         // inicializa atributos de movimento inativo
-        this.anguloMov = 0;
-        this.anguloCauda = 0;
-        this.anguloCorpo = 0;
-        this.velocidadeMovCorpo = 0.5; 
-        this.velocidadeMovCauda = 0.5;
         this.raioMov = 1;
-    }
-
-    // método para atualizar a posição de uma parte do peixe
-    atualizaPosicaoParte(parte, offset) {
-        let anguloRad = this.corpo.theta[2] * Math.PI / 180; // angulo de rotaçao do peixe em torno do eixo z
-        let offsetRotacionado = vec3(
-            offset[0] * Math.cos(anguloRad) - offset[1] * Math.sin(anguloRad),
-            offset[0] * Math.sin(anguloRad) + offset[1] * Math.cos(anguloRad),
-            offset[2]
-        ); // rotacionando o offset em torno do eixo z (usando como ref a matriz de rotaçao no eixo z)
-        parte.trans = offsetRotacionado;
+        this.angMov = 0;
+        this.vMov = 0.5;
+        this.angCauda = 0;
+        this.vCauda = 5;
     }
 
     // método para atualizar a rotação da cauda
-    atualizaRotacaoCauda() {
-        let rotCauda = 20 * Math.sin(this.anguloCauda); // 20 é a amplitude de rotação da cauda
+    atualizaRotacaoParte(deltaTempo) {
+        this.angCauda += this.vCauda * deltaTempo;
+        let rotCauda = 20 * Math.sin(this.angCauda); // 20 é a amplitude de rotação da cauda
         this.cauda.theta = vec3(0, 0, this.corpo.theta[2] + rotCauda - 90);
     }
 
-    atualizaRotacaoCorpo() {
-        let rotCorpo = 5 * Math.sin(this.anguloCorpo); // 5 é a amplitude de rotação da Corpo
-        this.corpo.theta = vec3(90, -90, -rotCorpo);
-    }
-
+    // move peixe em infinito/figure-8 quando seu POV está inativo 
     atualizaMovimentoInativo(deltaTempo) {
-        this.anguloMov += this.velocidadeMovCorpo * deltaTempo;
-
-        // calcula a nova posição usando funções trigonométricas
-        // faz o peixe se mover em uma forma de infinito/"figure-8" 
-        let x = this.raioMov * Math.cos(this.anguloMov);
-        let y = this.raioMov * Math.sin(2*this.anguloMov) / 2;
-
-        // atualiza a posição do corpo
+        // calcula a posição usando funções trigonométricas
+        this.angMov += this.vMov * deltaTempo;
+        let x = this.raioMov * Math.cos(this.angMov);
+        let y = this.raioMov * Math.sin(2*this.angMov) / 2;
         this.trans = add(this.transInicial, vec3(x, y, 0));
 
-        // calcula a direção do movimento
-        let dx = -this.raioMov * Math.sin(this.anguloMov); // derivada de x
-        let dy = this.raioMov * Math.cos(2*this.anguloMov); // derivada de y
-
-        // calcula o ângulo de rotação
-        let anguloRotacao = Math.atan2(dy, dx) * 180 / Math.PI; // calcula angulo entre (x, y) e eixo x
-
-        // aplica a rotação ao corpo
-        this.corpo.theta = vec3(0, 0, anguloRotacao);
-
-        // atualiza a posição das partes
-        this.atualizaPosicaoParte(this.cauda, vec3(-1, 0, 0));
+        // calcula a rotação usando derivada de funções trigonométricas
+        let dx = -this.raioMov * Math.sin(this.angMov);
+        let dy = this.raioMov * Math.cos(2*this.angMov);
+        let angDir = Math.atan2(dy, dx) * 180 / Math.PI; // ângulo entre (x, y) e eixo X
+        this.theta = vec3(0, 0, angDir - 90);
 
         // atualiza a rotação da cauda
-        this.anguloCauda += this.velocidadeMovCauda * deltaTempo * 10;
-        this.atualizaRotacaoCauda();
+        this.atualizaRotacaoParte(deltaTempo);
     }
 }
 
@@ -228,8 +199,17 @@ class Caracol extends Animal{
         this.semiEixoY = 2;
         this.angMov = 0;
         this.vMov = 0.5;
+        this.angCabeca = 0;
+        this.vCabeca = 5;
     }
 
+    atualizaRotacaoParte(deltaTempo) {
+        this.angCabeca += this.vCabeca * deltaTempo;
+        let rotCabeca = 15 * Math.sin(this.angCabeca); // 30 é a amplitude de rotação da cabeça
+        this.cabeca.theta = vec3(rotCabeca, 0, 0);
+    }
+
+    // move caracol em elipse quando seu POV está inativo 
     atualizaMovimentoInativo(deltaTempo) {
         // calcula a posição usando funções trigonométricas
         this.angMov += this.vMov * deltaTempo;
@@ -240,7 +220,10 @@ class Caracol extends Animal{
         // calcula a rotação usando derivada de funções trigonométricas
         let dx = -this.semiEixoX * Math.sin(this.angMov);
         let dy = this.semiEixoY * Math.cos(this.angMov);
-        let angDir = (Math.atan2(dy, dx) * 180 / Math.PI) - 90; // ângulo entre (x, y) e eixo X
-        this.theta = vec3(0, 0, angDir);
+        let angDir = Math.atan2(dy, dx) * 180 / Math.PI; // ângulo entre (x, y) e eixo X
+        this.theta = vec3(0, 0, angDir - 90);
+
+        // atualiza a rotação da cabeca
+        this.atualizaRotacaoParte(deltaTempo);
     }
 }
