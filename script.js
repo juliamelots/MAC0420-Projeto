@@ -94,7 +94,8 @@ function buildInterface() {
     gInterface.peixe.onclick = callbackPeixe;
     gInterface.jardim.onclick = callbackJardim;
 
-    onkeypress = callbackKBoard;
+    onkeydown = callbackKBoard;
+    onkeyup = callbackParaMovimento;
 }
 
 /**
@@ -209,7 +210,7 @@ function updateSimulator() {
     for (let i = 0; i < gSimulator.animais.length; i++) {
         let a = gSimulator.animais.at(i);
         if (POVs[i+1]) {
-            gSimulator.ship.vTrans = gInterface.vTrans;
+            //gSimulator.ship.vTrans = gInterface.vTrans;
             gInterface.theta = a.theta;
             a.atualizaPOV(gSimulator.ship);
             a.atualizaTrans(gSimulator.dt, gSimulator.ship);
@@ -314,26 +315,27 @@ function callbackStep(e) {
  * callbackKBoard
  */
 function callbackKBoard(e) {
-    if (POVs[JARDIM] || POVs[ABELHA]) {
+    if (POVs[JARDIM] || POVs[ABELHA])
         controlaJardimAbelha(e);
-    }
-    else if (POVs[PEIXE] || POVs[CARACOL]) {
+    else if (POVs[PEIXE] || POVs[CARACOL])
         controlaPeixeCaracol(e);
-    }
 }
 
 function controlaJardimAbelha(e) {
     let key = e.key.toLowerCase();
     if (key == `k`) {
         gInterface.vTrans = 0.0;
+        gSimulator.ship.vTrans = gInterface.vTrans
         console.log("Tecla K: VEL zerada", gInterface.vTrans);
     }
     else if (key == `j`) {
         gInterface.vTrans -= STEP_VTRANS;
+        gSimulator.ship.vTrans = gInterface.vTrans
         console.log("Tecla J: VEL-", gInterface.vTrans);
     }
     else if (key == `l`) {
         gInterface.vTrans += STEP_VTRANS;
+        gSimulator.ship.vTrans = gInterface.vTrans
         console.log("Tecla L: VEL+", gInterface.vTrans);
     }
     else if (key == `w`) {
@@ -368,6 +370,7 @@ function controlaPeixeCaracol(e) {
     let key = e.key.toLowerCase();
     if (key == `k`) {
         gInterface.vTrans = 0.0;
+        gSimulator.ship.vTrans = gInterface.vTrans;
         console.log("Tecla K: VEL zerada", gInterface.vTrans);
     }
     else if (key == `j`) {
@@ -377,6 +380,14 @@ function controlaPeixeCaracol(e) {
     else if (key == `l`) {
         gInterface.vTrans += STEP_VTRANS;
         console.log("Tecla L: VEL+", gInterface.vTrans);
+    }
+    else if (key == `w`) {
+        gSimulator.ship.vTrans = gInterface.vTrans;
+        console.log("Tecla W: anda para frente", gInterface.vTrans);
+    }
+    else if (key == `s`) {
+        gSimulator.ship.vTrans = -gInterface.vTrans;
+        console.log("Tecla S: anda de ré", gInterface.vTrans);
     }
     else if (key == `a`) {
         gInterface.theta[Z] += STEP_THETA;
@@ -389,6 +400,20 @@ function controlaPeixeCaracol(e) {
     else
         console.log("Tecla de controle inválida.");
 } 
+
+function callbackParaMovimento(e) {
+    if (POVs[CARACOL] || POVs[PEIXE]) {
+        let key = e.key.toLowerCase();
+        if (key == `w`) {
+            gSimulator.ship.vTrans = 0
+            console.log("Tecla W solta: para de andar", gInterface.vTrans);
+        }
+        else if (key == `s`) {
+            gSimulator.ship.vTrans = 0;
+            console.log("Tecla S solta: para de andar", gInterface.vTrans);
+        }
+    }
+}
 
 function callbackMudaDia(e) {
     let porcentagem = gInterface.slider.value; // valor do slider de 0.0 a 100.0
