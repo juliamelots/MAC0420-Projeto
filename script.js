@@ -320,10 +320,18 @@ function callbackStep(e) {
  * callbackKBoard
  */
 function callbackKBoard(e) {
+    if (POVs[JARDIM] || POVs[ABELHA]) {
+        controlaJardimAbelha(e);
+    }
+    else if (POVs[PEIXE] || POVs[CARACOL]) {
+        controlaPeixeCaracol(e);
+    }
+}
+
+function controlaJardimAbelha(e) {
     let key = e.key.toLowerCase();
     if (key == `k`) {
         gInterface.vTrans = 0.0;
-        //gSimulator.ship.vTrans = 0.0;
         console.log("Tecla K: VEL zerada", gInterface.vTrans);
     }
     else if (key == `j`) {
@@ -360,9 +368,41 @@ function callbackKBoard(e) {
     }
     else
         console.log("Tecla de controle inválida.");
-    console.log(gSimulator.ship.trans)
 }
 
+function controlaPeixeCaracol(e) {
+    let key = e.key.toLowerCase();
+    if (key == `k`) {
+        gInterface.vTrans = 0.0;
+        console.log("Tecla K: VEL zerada", gInterface.vTrans);
+    }
+    else if (key == `j`) {
+        gInterface.vTrans -= STEP_VTRANS;
+        console.log("Tecla J: VEL-", gInterface.vTrans);
+    }
+    else if (key == `l`) {
+        gInterface.vTrans += STEP_VTRANS;
+        console.log("Tecla L: VEL+", gInterface.vTrans);
+    }
+/*     else if (key == `w`) {
+        gInterface.theta[X] += STEP_THETA;
+        console.log("Tecla W: ROT(X)+ sobe", gInterface.theta);
+    } */
+/*     else if (key == `x`) {
+        gInterface.theta[X] -= STEP_THETA;
+        console.log("Tecla X: ROT(X)- desce", gInterface.theta);
+    } */
+    else if (key == `a`) {
+        gInterface.theta[Z] += STEP_THETA;
+        console.log("Tecla Z: ROT(Z)+ anti-horário", gInterface.theta);
+    }
+    else if (key == `d`) {
+        gInterface.theta[Z] -= STEP_THETA;
+        console.log("Tecla C: ROT(Z)- horário", gInterface.theta);
+    }
+    else
+        console.log("Tecla de controle inválida.");
+} 
 
 function callbackMudaDia(e) {
     let porcentagem = gInterface.slider.value; // valor do slider de 0.0 a 100.0
