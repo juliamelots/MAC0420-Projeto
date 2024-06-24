@@ -447,6 +447,8 @@ function callbackJardim(e) {
 
     gSimulador.camera.trans = vec3(15, -15, 10);
     gInterface.theta = vec3(60, 0, 45);
+    gInterface.vTrans = 0.0;
+    gSimulador.camera.vTrans = gInterface.vTrans;
 }
 
 /* ==================================================================
