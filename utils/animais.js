@@ -198,28 +198,28 @@ class Peixe extends Animal{
 class Caracol extends Animal{
     constructor(transInicial, gl, pathTexturaCorpo, pathTexturaConcha) {
         super(transInicial, gl);
-
+        
         // cria corpo do caracol
         this.corpo = new Elemento(new Cilindro(8), gl, pathTexturaCorpo);
         this.corpo.escala = vec3(0.35, 0.35, 2);
         this.corpo.trans = vec3(0, 0, 0);
-        this.corpo.theta = vec3(0, 90, 0);
+        this.corpo.theta = vec3(90, 0, 0);
         this.corpo.cor = NEUTRO;
         this.corpo.cor.especular = 100.0;
         this.elementos.push(this.corpo);
 
         // cria cabeca do caracol
         this.cabeca = new Elemento(new Cilindro(8), gl, pathTexturaCorpo);
-        this.cabeca.escala = vec3(0.35, 0.35, 1);
-        this.cabeca.trans = vec3(1, 0, 0.50);
+        this.cabeca.escala = vec3(0.35, 0.35, 1.5);
+        this.cabeca.trans = vec3(0, 1, 0.75);
         this.cabeca.cor = NEUTRO;
         this.cabeca.cor.especular = 100.0;
         this.elementos.push(this.cabeca);
 
         // cria concha do caracol
         this.concha = new Elemento(new Esfera(2), gl, pathTexturaConcha);
-        this.concha.escala = vec3(0.75, 0.35, 0.75);
-        this.concha.trans = vec3(-0.15, 0, 1);
+        this.concha.escala = vec3(0.35, 1, 0.75);
+        this.concha.trans = vec3(0, -0.25, 1);
         this.concha.cor = NEUTRO;
         this.elementos.push(this.concha);
 
@@ -228,13 +228,6 @@ class Caracol extends Animal{
         this.semiEixoY = 2;
         this.angMov = 0;
         this.vMov = 0.5;
-    }
-
-    // método para atualizar a rotação da cauda
-    atualizaRotacaoCabeca(theta) {
-        this.anguloCabeca += this.velocidadeMovCabeca * deltaTempo * 10;
-        let rotCauda = 20 * Math.sin(this.anguloCauda); // 20 é a amplitude de rotação da cauda
-        this.cauda.theta[Z] += rotCauda - 90;
     }
 
     atualizaMovimentoInativo(deltaTempo) {
@@ -247,9 +240,7 @@ class Caracol extends Animal{
         // calcula a rotação usando derivada de funções trigonométricas
         let dx = -this.semiEixoX * Math.sin(this.angMov);
         let dy = this.semiEixoY * Math.cos(this.angMov);
-        this.theta = vec3(0, 0, Math.atan2(dy, dx) * 180 / Math.PI); // ângulo entre (x, y) e eixo 
-
-        // atualiza a rotação da cabeça
-        // this.atualizaRotacaoCabeca(deltaTempo);
+        let angDir = (Math.atan2(dy, dx) * 180 / Math.PI) - 90; // ângulo entre (x, y) e eixo X
+        this.theta = vec3(0, 0, angDir);
     }
 }
