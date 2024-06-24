@@ -51,7 +51,6 @@ var POVs = [
     false,  // peixe
 ]
 
-
 /* ==================================================================
   Funções principais
 */
@@ -112,6 +111,7 @@ function buildSimulator() {
     // muda o AT da camera
     //gInterface.theta = vec3(70, 0, -180);
     gInterface.theta = vec3(60, 0, 45);
+    gInterface.vTrans = 0.0;
 
     // sol
     let sol = new Elemento(null, gGL, null);
@@ -200,8 +200,11 @@ function updateSimulator() {
         gSimulator.time = time_now;
     }
 
-    gSimulator.ship.atualizaTrans(gSimulator.dt);
-    gSimulator.ship.atualizaTheta(gInterface.theta);
+    if (POVs[JARDIM]) {
+        gSimulator.ship.vTrans = gInterface.vTrans;
+        gSimulator.ship.atualizaTrans(gSimulator.dt);
+        gSimulator.ship.atualizaTheta(gInterface.theta);
+    }
 
     for (let i = 0; i < gSimulator.obstaculos.length; i++) {
         let o = gSimulator.obstaculos.at(i);
@@ -212,7 +215,8 @@ function updateSimulator() {
     for (let i = 0; i < gSimulator.animais.length; i++) {
         let a = gSimulator.animais.at(i);
         if (POVs[i+1]) {
-            a.atualizaPOV(gSimulator.ship)
+            a.atualizaPOV(gSimulator.ship);
+            a.atualizaTrans(gSimulator.dt, gSimulator.ship);
         }
         else {
             a.atualizaMovimentoInativo(gSimulator.dt);
@@ -316,16 +320,17 @@ function callbackStep(e) {
 function callbackKBoard(e) {
     let key = e.key.toLowerCase();
     if (key == `k`) {
-        gSimulator.ship.vTrans = 0.0;
-        console.log("Tecla K: VEL zerada", gSimulator.ship.vTrans);
+        gInterface.vTrans = 0.0;
+        //gSimulator.ship.vTrans = 0.0;
+        console.log("Tecla K: VEL zerada", gInterface.vTrans);
     }
     else if (key == `j`) {
-        gSimulator.ship.vTrans += STEP_VTRANS;
-        console.log("Tecla J: VEL+", gSimulator.ship.vTrans);
+        gInterface.vTrans -= STEP_VTRANS;
+        console.log("Tecla J: VEL-", gInterface.vTrans);
     }
     else if (key == `l`) {
-        gSimulator.ship.vTrans -= STEP_VTRANS;
-        console.log("Tecla L: VEL-", gSimulator.ship.vTrans);
+        gInterface.vTrans += STEP_VTRANS;
+        console.log("Tecla L: VEL+", gInterface.vTrans);
     }
     else if (key == `w`) {
         gInterface.theta[X] += STEP_THETA;
@@ -428,19 +433,9 @@ function callbackPeixe(e) {
     ativaPOV(PEIXE);
 
     let peixe = gSimulator.peixe;
-    //gSimulator.ship.trans = vec3(-5, -10, 1.5);
-    //gInterface.theta = vec3(78, 0, -1);
 
     peixe.atualizaPOV(gSimulator.ship)
     gInterface.theta = peixe.theta;
-
-    //let rZ = rotateZ(peixe.theta[Z]);
-    //let rX = rotateX(peixe.theta[X]);
-    //let offsetCamera = mult(rZ, mult(rX, vec4(0, -1, 5, 1)));
-
-    // posicionar camera com offset
-    //gSimulator.ship.trans = add(peixe.trans, vec3(offsetCamera[X], offsetCamera[Y], offsetCamera[Z]));
-    //gSimulator.theta = vec3(90, 0, -90)
 }
 
 function callbackJardim(e) {

@@ -27,6 +27,12 @@ class Animal extends Elemento {
     // posicionar camera com offset
     camera.trans = add(this.trans, vec3(offsetCamera[X], offsetCamera[Y], offsetCamera[Z]));
     camera.atualizaTheta(vec3(this.theta[X] + 75, this.theta[Y], this.theta[Z]));
+
+    camera.vTrans = gInterface.vTrans;
+    }
+
+    atualizaTrans(deltaTempo, camera) {
+        this.trans = add(this.trans, mult(camera.vTrans * deltaTempo, camera.frente));
     }
 }
 
