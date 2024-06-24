@@ -73,10 +73,6 @@ class Elemento {
         this.trans = add(this.trans, mult(deltaTempo, this.vTrans));
     }
 
-    atualizaVTrans(deltaTempo) {
-        this.vTrans[2] -= G * deltaTempo;
-    }
-
     atualizaTheta(deltaTempo) {
         this.theta = add(this.theta, mult(deltaTempo, this.vTheta));
     }
